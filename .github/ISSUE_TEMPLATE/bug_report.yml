@@ -1,0 +1,17 @@
+name: Bug Report
+description: Report a bug in the codebase
+title: "[B]: "
+labels: ["status: Pending"]
+type: Bug
+body:
+  - type: markdown
+    attributes:
+        value: |
+          Thanks for reporting a bug in NoJam!
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please describe the bug you encountered.
+    validations:
+      required: true

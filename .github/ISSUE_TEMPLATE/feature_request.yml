@@ -1,0 +1,17 @@
+name: Feature Request
+description: Suggest a new feature for NoJam
+title: "[F]: "
+labels: ["status: Pending"]
+type: Feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature for NoJam!
+  - type: textarea
+    id: TLDR
+    attributes:
+      label: TLDR
+      description: Please describe your feature in one line.
+    validations:
+      required: true
