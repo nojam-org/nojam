@@ -1,4 +1,4 @@
-![NoJam Logo Long](assets/logo-long-no-bg.png)
+![NoJam Logo Long](assets/logo-long.png)
 > DISCLAIMER: NoJam is designed for the _Municipality of Trento_ (but is extensible to other municipalities and provincial authorities). It is being developed as part of the **Software Engineering** course at **Università di Trento**.
 
 ---
