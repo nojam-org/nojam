@@ -1,7 +1,10 @@
 # Il progetto NoJam
 
-<!-- TODO: inline the 3 pictures -->
-![Problema](assets/problem.png)![Soluzione](assets/solution.png)![Vantaggi](assets/advantages.png)
+<p style="display:flex; gap:10px;">
+  <img src="assets/problem.png" alt="Problema" width="33%" />
+  <img src="assets/solution.png" alt="Soluzione" width="33%" />
+  <img src="assets/advantages.png" alt="Vantaggi" width="33%" />
+</p>
 
 A Trento il traffico è un problema sistemico: la nostra città si sviluppa su assi viari obbligati. Quando partono i cantieri estivi o nevica, la città si ferma. Le informazioni ufficiali esistono, il Comune e la Provincia pubblicano dettagliate ordinanze in PDF e tabelle di marcia, ma rimangono isolate su siti burocratici. I grandi navigatori ignorano la programmazione locale. Il risultato è ore perse nel traffico, aumento delle emissioni e un’amministrazione che fatica a gestire la viabilità.
 
@@ -13,21 +16,16 @@ Ci si potrebbe chiedere: perché un utente dovrebbe scegliere NoJam rispetto a G
 Le grandi piattaforme globali lavorano su macro-dati e sulla reattività aggregata. NoJam vince sulla granularità: dialoga direttamente con gli enti territoriali e conosce la mappa dei lavori o della neve prima che abbiano un impatto sulla strada.
 Trento rappresenta il nostro campo di prova e il laboratorio ideale per densità e conformazione viaria. Tuttavia, l'architettura software di NoJam è strutturata in modo modulare: la logica di ingestion delle ordinanze e il motore predittivo sono nativamente pronti per essere scalati e adottati da qualsiasi altro Comune o Provincia.
 
-<!--
-TODO: add this things
-
 ### Vantaggi per il comune
-- [Vantaggio 1: es. ottimizzazione dei processi, riduzione dei costi, migliore gestione delle risorse]
-- [Vantaggio 2]
-- [Vantaggio 3]
+- **Smart governance della mobilità:** il Comune e la Provincia dispongono di un canale diretto per pubblicare ordinanze, cantieri, deviazioni e allerte neve, orchestrando la viabilità in modo proattivo anziché reattivo.
+- **Decisioni basate sui dati:** l’incrocio tra dati ufficiali e segnalazioni degli utenti fornisce al territorio analitiche <!-- TODO: is that how you say it??? -->aggregate sul traffico e sulle criticità, a supporto della pianificazione urbana e della gestione delle emergenze.
+- **Valorizzazione del lavoro amministrativo:** le ordinanze e le informazioni già prodotte dagli enti diventano immediatamente fruibili per i cittadini, riducendo confusione, reclami e pressione sui canali istituzionali.
 
 ### Vantaggi per i cittadini
-- [Vantaggio 1: es. accesso remoto, autonomia, trasparenza]
-- [Vantaggio 2]
-- [Vantaggio 3]
+- **Percorsi personalizzati su dati verificati:** il motore di routing combina dati ufficiali del territorio con segnalazioni in tempo reale, proponendo itinerari più affidabili rispetto ai navigatori globali.
+- **Alert preventivi prima di partire:** notifiche su cantieri programmati, sgombero neve, incidenti e rallentamenti permettono di pianificare gli spostamenti con anticipo e ridurre il tempo perso nel traffico.
+- **Trasparenza e fiducia:** ogni segnalazione viene pesata dall’algoritmo tramite incrocio con fonti ufficiali, rendendo esplicito il livello di affidabilità delle informazioni.
 
 ### Limiti dell'applicazione
-- [Limite 1: es. dipendenza dalla connessione internet, accessibilità digitale]
-- [Limite 2]
-- [Limite 3]
--->
+- **Dipendenza dai dati aperti della Pubblica Amministrazione:** la completezza e l’aggiornamento delle informazioni statiche dipendono dalla qualità, dal formato e dalla frequenza di pubblicazione dei dati degli enti territoriali.
+- **Efficacia legata all’adozione degli utenti:** la copertura e l’affidabilità delle segnalazioni in tempo reale crescono con il numero di cittadini attivi sulla piattaforma.
