@@ -1,2 +1,5 @@
 .vscode
 .idea
+
+hidden_*
+*.tex
