@@ -93,3 +93,39 @@ L'utente deve poter inserire la data e l'ora di una partenza futura e ricevere l
 
 ### RF-029: Chiusura e cancellazione dell'account
 Il sistema deve consentire all'utente di richiedere la chiusura definitiva del proprio account con contestuale rimozione o anonimizzazione dei dati personali registrati.
+
+### RF-030: Ricerca indirizzi e punti di interesse
+Il sistema deve consentire agli utenti di cercare indirizzi, toponimi e punti di interesse sul territorio, visualizzando i risultati sulla mappa e permettendo di avviare la navigazione o salvare la località tra i preferiti.
+
+### RF-031: Anteprima e simulazione del percorso
+Prima di avviare la navigazione, l'utente deve poter visualizzare in anteprima il percorso calcolato e, opzionalmente, avviare una simulazione del viaggio per conoscerne i tempi e le indicazioni stradali.
+
+### RF-032: Navigazione turn-by-turn
+Il sistema deve fornire indicazioni vocali e visive passo-passo durante la guida, aggiornando le istruzioni in tempo reale in base alla posizione dell'utente e alle variazioni del percorso.
+
+### RF-033: Integrazione con sistemi di infotainment veicolari
+L'applicazione mobile deve supportare la proiezione dell'interfaccia di navigazione su Android Auto e Apple CarPlay, garantendo l'accesso alle funzioni essenziali in modalità hands-free.
+
+### RF-034: Gestione ruoli e permessi degli operatori
+Il sistema deve permettere agli amministratori della PA di definire ruoli personalizzati e assegnare permessi granulari agli operatori (es. lettura, inserimento, modifica, validazione, pubblicazione).
+
+### RF-035: Log di audit operativi
+Il sistema deve registrare in maniera non modificabile le azioni eseguite dagli operatori PA (inserimenti, modifiche, validazioni, pubblicazioni) per garantire tracciabilità e responsabilità.
+
+### RF-036: Importazione massiva dati
+Il sistema deve consentire agli operatori PA di importare in blocco dati relativi a cantieri, ordinanze, chiusure e piani neve tramite file standard (es. CSV, GeoJSON, Shapefile).
+
+### RF-037: Accettazione dei termini e condizioni
+Il sistema deve richiedere agli utenti l'accettazione dei termini di servizio e della privacy policy prima della registrazione e, in caso di aggiornamenti sostanziali, prima di continuare l'uso dell'app.
+
+### RF-038: Gestione consensi cookie e GDPR
+Il sistema deve mostrare un banner informativo sui cookie e sui trattamenti dei dati, permettendo all'utente di gestire i consensi in modo granulare in conformità al GDPR.
+
+### RF-039: Applicazione delle politiche di retention
+Il sistema deve applicare automaticamente le politiche di conservazione dei dati personali e delle segnalazioni, anonimizzando o eliminando le informazioni al termine dei periodi previsti dalle normative e dalle policy interne.
+
+### RF-040: Gestione avanzata delle notifiche
+L'utente deve poter configurare in dettaglio le notifiche ricevute (tipologia di evento, canale, raggio di prossimità, fasce orarie di silenzio), nonché disattivarle temporaneamente.
+
+### RF-041: Notifiche contestuali multicanale
+Il sistema deve inviare notifiche push, email o SMS in base alla natura dell'evento e alle preferenze dell'utente, garantendo la comunicazione anche in assenza di connessione dati attiva sull'app.
