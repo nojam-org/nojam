@@ -1,10 +1,8 @@
 # Il progetto NoJam
 
-<p style="display:flex; gap:10px;">
-  <img src="assets/problem.png" alt="Problema" width="33%" />
-  <img src="assets/solution.png" alt="Soluzione" width="33%" />
-  <img src="assets/advantages.png" alt="Vantaggi" width="33%" />
-</p>
+![Problema](assets/problem.png){width=33%}
+![Soluzione](assets/solution.png){width=33%}
+![Vantaggi](assets/advantages.png){width=33%}
 
 A Trento il traffico è un problema sistemico: la nostra città si sviluppa su assi viari obbligati. Quando partono i cantieri estivi o nevica, la città si ferma. Le informazioni ufficiali esistono, il Comune e la Provincia pubblicano dettagliate ordinanze in PDF e tabelle di marcia, ma rimangono isolate su siti burocratici. I grandi navigatori ignorano la programmazione locale. Il risultato è ore perse nel traffico, aumento delle emissioni e un’amministrazione che fatica a gestire la viabilità.
 
