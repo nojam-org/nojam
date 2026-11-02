@@ -38,3 +38,23 @@ L'interfaccia dell'applicazione (sia mobile che desktop) deve consentire il camb
 L'interfaccia per i cittadini deve consentire l'invio di una segnalazione con un massimo di 3 tocchi/click (es. selezione tipo imprevisto + conferma posizione), utilizzabile intuitivamente entro 2 minuti dal primo avvio senza necessità di istruzioni. Per la componente di navigazione/consultazione alla guida, la visualizzazione deve essere ottimizzata a contrasto elevato con indicazioni sintetiche per ridurre al minimo le distrazioni.
 
 **Motivazione:** Gli utenti inviano segnalazioni spesso dal veicolo (a veicolo fermo o tramite passeggero). Un processo di segnalazione lungo o complesso scoraggerebbe l'uso della funzione predittiva della community e aumenterebbe i rischi legati alla distrazione.
+
+### RNF-007: Sicurezza e Privacy
+Il sistema deve garantire la riservatezza, l'integrità e la disponibilità dei dati personali e delle credenziali degli utenti. Le comunicazioni tra client, server e servizi terzi devono avvenire esclusivamente su canali cifrati (TLS 1.2+). I dati sensibili (password, token, posizioni GPS grezze, log di audit) devono essere crittografati a riposo con algoritmi conformi agli standard correnti (es. AES-256). L'autenticazione deve supportare MFA per gli operatori PA e l'accesso alle funzionalità amministrative deve essere soggetto a controllo degli accessi basato sui ruoli (RBAC). La piattaforma deve rispettare il GDPR e consentire esercizio dei diritti dell'interessato (accesso, retifica, cancellazione, portabilità).
+
+**Motivazione:** NoJam tratta dati personali (account, storico spostamenti, geolocalizzazione) e dati istituzionali sensibili. Una violazione o un accesso non autorizzato alla dashboard PA comprometterebbe la fiducia degli utenti e la sicurezza della viabilità gestita dal Comune.
+
+### RNF-008: Accessibilità
+L'interfaccia web e mobile deve rispettare i requisiti di accessibilità previsti dallo standard WCAG 2.1 livello AA. In particolare, devono essere garantiti: contrasto minimo 4.5:1 per il testo normale, navigazione completa tramite tastiera/screen reader, testi alternativi per le immagini e le icone, dimensioni dei caratteri ridimensionabili fino al 200% senza perdita di funzionalità, e supporto per le principiali tecnologie assistive.
+
+**Motivazione:** NoJam è un servizio pubblico rivolto a tutti i cittadini, inclusi utenti con disabilità visive, motorie o cognitive. Garantire l'accessibilità non è solo un obbligo normativo per le PA, ma allarga la base di utenti attivi che contribuiscono con segnalazioni in tempo reale.
+
+### RNF-009: Backup e Disaster Recovery
+Il sistema deve effettuare backup automatici giornalieri dei dati critici (configurazioni, dati utente, eventi di viabilità, log di audit) con politica di retention conforme alle policy interne e normative. Deve essere garantito un Recovery Point Objective (RPO) massimo di 24 ore e un Recovery Time Objective (RTO) massimo di 4 ore per i servizi core in caso di incidente. Almeno una copia di backup deve essere mantenuta in una zona geografica diversa da quella di produzione.
+
+**Motivazione:** In situazioni di emergenza viaria (nevicate, frane, allagamenti) l'indisponibilità prolungata o la perdita di dati sarebbero inaccettabili. Un piano di disaster recovery robusto integra il requisito di alta disponibilità già espresso in RNF-004.
+
+### RNF-010: Interoperabilità e Standard Aperti
+Il sistema deve scambiare dati con enti territoriali, servizi di terze parti e sistemi esterni utilizzando formati e protocolli aperti e standard di settore. L'ingestion dei dati PA deve supportare almeno CSV, GeoJSON e Shapefile; le API pubbliche devono essere documentate secondo lo standard OpenAPI 3.0 e restituire dati in JSON/GeoJSON. L'integrazione con i provider di identità deve supportare protocolli standard come OAuth 2.0 / OpenID Connect e SPID/CIE per il pubblico italiano.
+
+**Motivazione:** NoJam nasce per integrare fonti eterogenee (Comune, Provincia, servizi parcheggi/TPL) e per rilasciare Open Data verso terzi. L'adozione di standard aperti riduce i costi di integrazione, garantisce la riusabilità della piattaforma da parte di altri enti e sostiene gli obiettivi di Smart Governance e trasparenza.
