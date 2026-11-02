@@ -4,8 +4,8 @@
 
 <!--
 ### [Attore 1]
-- UC-000: [titolo use case] — RF-000
-- UC-010: [titolo use case] — RF-010
+- UC-000: [titolo use case] - RF-000
+- UC-010: [titolo use case] - RF-010
 
 ![](use case diagram 1)
 
@@ -45,10 +45,10 @@
 | Sistema Terzo | Applicativo o portale istituzionale che consuma le API Open Data. |
 
 ### Utente Anonimo
-- UC-001: Registrazione utente — RF-001
-- UC-002: Login utente — RF-002
-- UC-006: Gestione dei permessi — RF-006
-- UC-017: Consultazione mappa interattiva ed eventi — RF-017
+- UC-001: Registrazione utente - RF-001
+- UC-002: Login utente - RF-002
+- UC-006: Gestione dei permessi - RF-006
+- UC-017: Consultazione mappa interattiva ed eventi - RF-017
 
 ```mermaid
 usecase-beta
@@ -149,14 +149,14 @@ UC017a ..> : extend UC017
 **Estensioni:**
 1. Filtro dei livelli e delle categorie di contenuto visualizzati sulla mappa.
 
-### Utente Autenticato — Account e privacy
-- UC-003: Gestione del profilo — RF-003
-- UC-004: Gestione preferenze — RF-004
-- UC-007: Logout utente — RF-007
-- UC-008: Gestione degli utenti e privacy — RF-008
-- UC-010: Gestione del canale di notifiche — RF-010
-- UC-012: Gestione di feedback ed errori — RF-012
-- UC-029: Chiusura e cancellazione dell'account — RF-029
+### Utente Autenticato - Account e privacy
+- UC-003: Gestione del profilo - RF-003
+- UC-004: Gestione preferenze - RF-004
+- UC-007: Logout utente - RF-007
+- UC-008: Gestione degli utenti e privacy - RF-008
+- UC-010: Gestione del canale di notifiche - RF-010
+- UC-012: Gestione di feedback ed errori - RF-012
+- UC-029: Chiusura e cancellazione dell'account - RF-029
 
 ```mermaid
 usecase-beta
@@ -310,10 +310,10 @@ UC008a --> ServizioEmail
 **Estensioni:**
 1. Invio di un'email di conferma dell'avvenuta eliminazione.
 
-### Utente — Consensi e conformità normativa
-- UC-037: Accettazione dei termini e condizioni — RF-037
-- UC-038: Gestione consensi cookie e GDPR — RF-038
-- UC-039: Applicazione delle politiche di retention — RF-039
+### Utente - Consensi e conformità normativa
+- UC-037: Accettazione dei termini e condizioni - RF-037
+- UC-038: Gestione consensi cookie e GDPR - RF-038
+- UC-039: Applicazione delle politiche di retention - RF-039
 
 ```mermaid
 usecase-beta
@@ -401,14 +401,14 @@ UC039b ..> : extend UC039
 **Estensioni:**
 1. Configurazione dei periodi di conservazione per tipologia di dato da parte dell'Amministratore PA.
 
-### Utente Autenticato — Mappa e navigazione
-- UC-005: Gestione luoghi e percorsi salvati — RF-005
-- UC-009: Gestione della geolocalizzazione — RF-009
-- UC-016: Calcolo e ottimizzazione percorsi — RF-016
-- UC-021: Notifiche e allerte preventive di mobilità — RF-021
-- UC-023: Modalità di guida offline parziale — RF-023
-- UC-024: Integrazione con trasporti pubblici e parcheggi — RF-024
-- UC-028: Pianificazione temporale dei viaggi — RF-028
+### Utente Autenticato - Mappa e navigazione
+- UC-005: Gestione luoghi e percorsi salvati - RF-005
+- UC-009: Gestione della geolocalizzazione - RF-009
+- UC-016: Calcolo e ottimizzazione percorsi - RF-016
+- UC-021: Notifiche e allerte preventive di mobilità - RF-021
+- UC-023: Modalità di guida offline parziale - RF-023
+- UC-024: Integrazione con trasporti pubblici e parcheggi - RF-024
+- UC-028: Pianificazione temporale dei viaggi - RF-028
 
 ```mermaid
 usecase-beta
@@ -564,11 +564,11 @@ UC028a ..> : extend UC028
 **Estensioni:**
 1. Salvataggio del viaggio pianificato con promemoria automatico prima della partenza.
 
-### Utente — Ricerca e navigazione assistita
-- UC-030: Ricerca indirizzi e punti di interesse — RF-030
-- UC-031: Anteprima e simulazione del percorso — RF-031
-- UC-032: Navigazione turn-by-turn — RF-032
-- UC-033: Integrazione con sistemi di infotainment veicolari — RF-033
+### Utente - Ricerca e navigazione assistita
+- UC-030: Ricerca indirizzi e punti di interesse - RF-030
+- UC-031: Anteprima e simulazione del percorso - RF-031
+- UC-032: Navigazione turn-by-turn - RF-032
+- UC-033: Integrazione con sistemi di infotainment veicolari - RF-033
 
 ```mermaid
 usecase-beta
@@ -681,11 +681,11 @@ UC033a ..> : extend UC033
 **Estensioni:**
 1. Interazione tramite comandi vocali per avviare la navigazione o inviare una segnalazione senza distogliere l'attenzione dalla guida.
 
-### Utente Autenticato — Contributi alla community
-- UC-011: Cronologia delle segnalazioni — RF-011
-- UC-014: Invio segnalazioni in tempo reale — RF-014
-- UC-015: Valutazione affidabilità e reputation scoring — RF-015
-- UC-025: Badge e gamification della reputazione — RF-025
+### Utente Autenticato - Contributi alla community
+- UC-011: Cronologia delle segnalazioni - RF-011
+- UC-014: Invio segnalazioni in tempo reale - RF-014
+- UC-015: Valutazione affidabilità e reputation scoring - RF-015
+- UC-025: Badge e gamification della reputazione - RF-025
 
 ```mermaid
 usecase-beta
@@ -782,9 +782,9 @@ UC025a ..> : extend UC025
 **Estensioni:**
 1. Condivisione dei badge ottenuti sui canali social dell'utente.
 
-### Utente Autenticato — Notifiche avanzate
-- UC-040: Gestione avanzata delle notifiche — RF-040
-- UC-041: Notifiche contestuali multicanale — RF-041
+### Utente Autenticato - Notifiche avanzate
+- UC-040: Gestione avanzata delle notifiche - RF-040
+- UC-041: Notifiche contestuali multicanale - RF-041
 
 ```mermaid
 usecase-beta
@@ -856,11 +856,11 @@ UC041b ..> : extend UC041
 1. Riepilogo periodico via email degli avvisi non letti.
 
 ### Operatore PA
-- UC-013: Ingestion e sincronizzazione dati ufficiali PA — RF-013
-- UC-018: Gestione del piano neve — RF-018
-- UC-019: Pannello di gestione e Smart Governance — RF-019
-- UC-020: Analisi aggregate e reporting del traffico — RF-020
-- UC-027: Gestione eventi straordinari ed emergenze — RF-027
+- UC-013: Ingestion e sincronizzazione dati ufficiali PA - RF-013
+- UC-018: Gestione del piano neve - RF-018
+- UC-019: Pannello di gestione e Smart Governance - RF-019
+- UC-020: Analisi aggregate e reporting del traffico - RF-020
+- UC-027: Gestione eventi straordinari ed emergenze - RF-027
 
 ```mermaid
 usecase-beta
@@ -982,10 +982,10 @@ UC027a ..> : extend UC027
 **Estensioni:**
 1. Disattivazione e archiviazione dell'evento al ripristino delle condizioni di sicurezza.
 
-### Amministratore PA — Ruoli, audit e importazione dati
-- UC-034: Gestione ruoli e permessi degli operatori — RF-034
-- UC-035: Log di audit operativi — RF-035
-- UC-036: Importazione massiva dati — RF-036
+### Amministratore PA - Ruoli, audit e importazione dati
+- UC-034: Gestione ruoli e permessi degli operatori - RF-034
+- UC-035: Log di audit operativi - RF-035
+- UC-036: Importazione massiva dati - RF-036
 
 ```mermaid
 usecase-beta
@@ -1080,7 +1080,7 @@ UC036 ..> : extend UC019
 1. Annullamento di un'importazione completata entro un intervallo di tempo definito, con ripristino dello stato precedente.
 
 ### Moderazione automatica
-- UC-022: Moderazione automatica dei contenuti — RF-022
+- UC-022: Moderazione automatica dei contenuti - RF-022
 
 ```mermaid
 usecase-beta
@@ -1129,7 +1129,7 @@ UC022d ..> : extend UC015
 3. Limitazione automatica dei contributi degli utenti la cui reputazione scende sotto la soglia minima prevista.
 
 ### Sistemi esterni
-- UC-026: Esportazione ed API dati aperti (Open Data) — RF-026
+- UC-026: Esportazione ed API dati aperti (Open Data) - RF-026
 
 ```mermaid
 usecase-beta

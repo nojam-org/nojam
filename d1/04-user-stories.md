@@ -5,7 +5,7 @@ Ogni User Story utilizza un identificatore stabile US-XXX e ogni relativo criter
 -->
 
 <!--
-### US-000 – [Titolo user story]
+### US-000 - [Titolo user story]
 **Collegamenti:** RF-000; UC-000
 
 Come [tipo di utente], voglio [obiettivo] in modo da [beneficio].
