@@ -30,7 +30,7 @@ Il sistema deve garantire una disponibilità minima del 99,9% su base annua (dow
 **Motivazione:** *nojam* gestisce la viabilità e servizi essenziali (es. passaggi spazzaneve o chiusure strade per emergenze). L'indisponibilità della piattaforma durante un'emergenza viaria avrebbe un impatto negativo diretto sulla sicurezza e sul traffico cittadino.
 
 ### RNF-005: Lingua e Localizzazione
-L'interfaccia dell'applicazione (sia mobile che desktop) deve consentire il cambio di lingua istantaneo tra Italiano, Inglese e Tedesco. Tutti gli elementi dell'interfaccia grafica e i messaggi di sistema devono essere completamente tradotti e localizzati.
+Tutti gli elementi dell'interfaccia grafica e i messaggi di sistema devono essere completamente tradotti e localizzati nelle lingue supportate, garantendo coerenza terminologica e culturale.
 
 **Motivazione:** Il Comune gestisce il traffico non solo per i residenti, ma anche per pendolari, turisti e autotrasportatori stranieri che attraversano il territorio del comune di Trento e che necessitano di essere immediatamente a conoscenza di avvisi e deviazioni.
 
@@ -40,7 +40,7 @@ L'interfaccia per i cittadini deve consentire l'invio di una segnalazione con un
 **Motivazione:** Gli utenti inviano segnalazioni spesso dal veicolo (a veicolo fermo o tramite passeggero). Un processo di segnalazione lungo o complesso scoraggerebbe l'uso della funzione predittiva della community e aumenterebbe i rischi legati alla distrazione.
 
 ### RNF-007: Sicurezza e Privacy
-Il sistema deve garantire la riservatezza, l'integrità e la disponibilità dei dati personali e delle credenziali degli utenti. Le comunicazioni tra client, server e servizi terzi devono avvenire esclusivamente su canali cifrati (TLS 1.2+). I dati sensibili (password, token, posizioni GPS grezze, log di audit) devono essere crittografati a riposo con algoritmi conformi agli standard correnti (es. AES-256). L'autenticazione deve supportare MFA per gli operatori PA e l'accesso alle funzionalità amministrative deve essere soggetto a controllo degli accessi basato sui ruoli (RBAC). La piattaforma deve rispettare il GDPR e consentire esercizio dei diritti dell'interessato (accesso, retifica, cancellazione, portabilità).
+Il sistema deve garantire la riservatezza, l'integrità e la disponibilità dei dati personali e delle credenziali degli utenti nel rispetto del GDPR, consentendo l'esercizio dei diritti dell'interessato (accesso, retifica, cancellazione, portabilità).
 
 **Motivazione:** NoJam tratta dati personali (account, storico spostamenti, geolocalizzazione) e dati istituzionali sensibili. Una violazione o un accesso non autorizzato alla dashboard PA comprometterebbe la fiducia degli utenti e la sicurezza della viabilità gestita dal Comune.
 
@@ -49,12 +49,12 @@ L'interfaccia web e mobile deve rispettare i requisiti di accessibilità previst
 
 **Motivazione:** NoJam è un servizio pubblico rivolto a tutti i cittadini, inclusi utenti con disabilità visive, motorie o cognitive. Garantire l'accessibilità non è solo un obbligo normativo per le PA, ma allarga la base di utenti attivi che contribuiscono con segnalazioni in tempo reale.
 
-### RNF-009: Backup e Disaster Recovery
-Il sistema deve effettuare backup automatici giornalieri dei dati critici (configurazioni, dati utente, eventi di viabilità, log di audit) con politica di retention conforme alle policy interne e normative. Deve essere garantito un Recovery Point Objective (RPO) massimo di 24 ore e un Recovery Time Objective (RTO) massimo di 4 ore per i servizi core in caso di incidente. Almeno una copia di backup deve essere mantenuta in una zona geografica diversa da quella di produzione.
+### RNF-009: Disaster Recovery
+In caso di incidente deve essere garantito un Recovery Point Objective (RPO) massimo di 24 ore e un Recovery Time Objective (RTO) massimo di 4 ore per i servizi core.
 
 **Motivazione:** In situazioni di emergenza viaria (nevicate, frane, allagamenti) l'indisponibilità prolungata o la perdita di dati sarebbero inaccettabili. Un piano di disaster recovery robusto integra il requisito di alta disponibilità già espresso in RNF-004.
 
 ### RNF-010: Interoperabilità e Standard Aperti
-Il sistema deve scambiare dati con enti territoriali, servizi di terze parti e sistemi esterni utilizzando formati e protocolli aperti e standard di settore. L'ingestion dei dati PA deve supportare almeno CSV, GeoJSON e Shapefile; le API pubbliche devono essere documentate secondo lo standard OpenAPI 3.0 e restituire dati in JSON/GeoJSON. L'integrazione con i provider di identità deve supportare protocolli standard come OAuth 2.0 / OpenID Connect e SPID/CIE per il pubblico italiano.
+Il sistema deve scambiare dati con enti territoriali, servizi di terze parti e sistemi esterni utilizzando formati e protocolli aperti e standard di settore riconosciuti, garantendo riusabilità, trasparenza e facilità di integrazione.
 
 **Motivazione:** NoJam nasce per integrare fonti eterogenee (Comune, Provincia, servizi parcheggi/TPL) e per rilasciare Open Data verso terzi. L'adozione di standard aperti riduce i costi di integrazione, garantisce la riusabilità della piattaforma da parte di altri enti e sostiene gli obiettivi di Smart Governance e trasparenza.
