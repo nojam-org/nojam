@@ -33,14 +33,18 @@
 | Utente Anonimo | Utente non autenticato; può consultare la mappa, registrarsi e autenticarsi. |
 | Utente Autenticato | Utente con account attivo; accede alle funzionalità personali e contributive. |
 | Operatore PA | Operatore accreditato del Comune o della Provincia, con accesso alla dashboard di Smart Governance. |
+| Amministratore PA | Operatore PA con privilegi amministrativi; definisce ruoli, permessi e policy di conservazione dei dati. |
 | Moderatore | Ruolo incaricato della verifica dei contenuti inviati dalla community. |
 | Provider di Identità | Sistema esterno di autenticazione (Google SSO, SPID, CIE). |
 | Servizio Email | Sistema esterno per l'invio delle comunicazioni transazionali. |
+| Servizio SMS | Gateway esterno per l'invio di messaggi di testo sulla rete cellulare. |
 | Supporto Tecnico | Team che riceve e gestisce bug report e feedback. |
 | Ente Territoriale | Sorgente dati ufficiale (Comune, Provincia) per cantieri, ordinanze e piani neve. |
 | Mezzo Spazzaneve | Mezzo operativo dotato di trasmettitore GPS. |
 | Servizi Parcheggi e TPL | Sorgenti dati in tempo reale su sosta e trasporto pubblico. |
 | Servizio di Posizione | Sensore GPS e servizio di localizzazione del dispositivo. |
+| Servizio di Geocoding | Sorgente esterna di toponomastica e punti di interesse del territorio. |
+| Sistema di Infotainment | Piattaforma veicolare esterna (Android Auto, Apple CarPlay) su cui viene proiettata l'interfaccia di navigazione. |
 | Sistema Terzo | Applicativo o portale istituzionale che consuma le API Open Data. |
 
 ---
@@ -315,6 +319,99 @@ UC008a --> ServizioEmail
 
 ---
 
+### Utente — Consensi e conformità normativa
+- UC-037: Accettazione dei termini e condizioni — RF-037
+- UC-038: Gestione consensi cookie e GDPR — RF-038
+- UC-039: Applicazione delle politiche di retention — RF-039
+
+```mermaid
+usecase-beta
+direction LR
+
+actor Utente("Utente")
+actor UtenteAnonimo("Utente Anonimo")
+actor UtenteAutenticato("Utente Autenticato")
+actor AmministratorePA("Amministratore PA")
+
+systemBoundary NoJam["NoJam"]
+  UC037("UC-037: Accettazione dei termini e condizioni")
+  UC038("UC-038: Gestione consensi cookie e GDPR")
+  UC039("UC-039: Applicazione delle politiche di retention")
+  UC001("UC-001: Registrazione utente")
+  UC008("UC-008: Gestione degli utenti e privacy")
+
+  UC037a("Consultazione del testo integrale")
+  UC037b("Ri-accettazione dopo un aggiornamento sostanziale")
+  UC038a("Scelta granulare per singola finalità")
+  UC038b("Revisione dei consensi dal pannello privacy")
+  UC039a("Anonimizzazione delle segnalazioni storiche")
+  UC039b("Configurazione dei periodi di conservazione")
+end
+
+UtenteAnonimo --|> Utente
+UtenteAutenticato --|> Utente
+
+UtenteAnonimo --> UC001
+Utente --> UC038
+UtenteAutenticato --> UC008
+AmministratorePA --> UC039
+
+UC001 ..> : include UC037
+UC037 ..> : include UC037a
+UC038 ..> : include UC038a
+UC039 ..> : include UC039a
+
+UC037b ..> : extend UC037
+UC038b ..> : extend UC008
+UC039b ..> : extend UC039
+```
+
+#### Use case UC-037: Accettazione dei termini e condizioni
+**Riassunto:** Richiede all'utente l'accettazione esplicita dei termini di servizio e della privacy policy prima della registrazione e a ogni aggiornamento sostanziale.
+
+**Descrizione:**
+1. Durante la registrazione (UC-001) il sistema presenta all'utente i termini di servizio e la privacy policy in vigore.
+2. L'utente consulta i documenti e ne accetta esplicitamente il contenuto.
+3. Il sistema registra la versione accettata, la data e l'ora del consenso, e completa l'operazione in corso.
+
+**Eccezioni:**
+1. Mancata accettazione: il sistema interrompe la registrazione e non crea l'account.
+2. Accettazione negata a seguito di un aggiornamento: il sistema limita l'uso dell'applicazione alle sole funzionalità consultabili senza autenticazione.
+
+**Estensioni:**
+1. Richiesta di ri-accettazione al primo accesso successivo alla pubblicazione di una nuova versione dei documenti.
+
+#### Use case UC-038: Gestione consensi cookie e GDPR
+**Riassunto:** Informa l'utente sui cookie e sui trattamenti effettuati e gli consente di prestare o negare i consensi in modo granulare.
+
+**Descrizione:**
+1. Al primo accesso il sistema mostra il banner informativo su cookie e finalità di trattamento.
+2. L'utente accetta tutto, rifiuta i trattamenti non necessari oppure apre il pannello di scelta granulare.
+3. Il sistema applica immediatamente le scelte, attivando solo i servizi consentiti, e ne conserva traccia nel registro dei consensi.
+
+**Eccezioni:**
+1. Nessuna scelta effettuata: il sistema attiva i soli cookie tecnici necessari e ripropone il banner all'accesso successivo.
+
+**Estensioni:**
+1. Revisione e revoca dei consensi in qualsiasi momento dalla sezione "Privacy e dati personali" (UC-008).
+
+#### Use case UC-039: Applicazione delle politiche di retention
+**Riassunto:** Applica automaticamente i periodi di conservazione previsti, anonimizzando o eliminando dati personali e segnalazioni scadute.
+
+**Descrizione:**
+1. Il sistema esegue periodicamente il controllo delle scadenze definite dalle policy di conservazione.
+2. Il sistema individua dati personali, tracciati di posizione e segnalazioni che hanno superato il periodo previsto.
+3. Il sistema anonimizza o elimina i record interessati e registra l'operazione nel log di audit (UC-035).
+
+**Eccezioni:**
+1. Dato soggetto a un obbligo di conservazione prevalente (es. contenzioso in corso): il record viene escluso dalla cancellazione e marcato come trattenuto.
+2. Esecuzione interrotta da un errore: il sistema riprende dal punto di interruzione al ciclo successivo e segnala l'anomalia all'Amministratore PA.
+
+**Estensioni:**
+1. Configurazione dei periodi di conservazione per tipologia di dato da parte dell'Amministratore PA.
+
+---
+
 ### Utente Autenticato — Mappa e navigazione
 - UC-005: Gestione luoghi e percorsi salvati — RF-005
 - UC-009: Gestione della geolocalizzazione — RF-009
@@ -480,6 +577,125 @@ UC028a ..> : extend UC028
 
 ---
 
+### Utente — Ricerca e navigazione assistita
+- UC-030: Ricerca indirizzi e punti di interesse — RF-030
+- UC-031: Anteprima e simulazione del percorso — RF-031
+- UC-032: Navigazione turn-by-turn — RF-032
+- UC-033: Integrazione con sistemi di infotainment veicolari — RF-033
+
+```mermaid
+usecase-beta
+direction LR
+
+actor Utente("Utente")
+actor UtenteAutenticato("Utente Autenticato")
+actor ServizioGeocoding("Servizio di Geocoding")
+actor SistemaInfotainment("Sistema di Infotainment")
+
+systemBoundary NoJam["NoJam"]
+  UC030("UC-030: Ricerca indirizzi e punti di interesse")
+  UC031("UC-031: Anteprima e simulazione del percorso")
+  UC032("UC-032: Navigazione turn-by-turn")
+  UC033("UC-033: Integrazione con sistemi di infotainment")
+  UC005("UC-005: Gestione luoghi e percorsi salvati")
+  UC009("UC-009: Gestione della geolocalizzazione")
+  UC016("UC-016: Calcolo e ottimizzazione percorsi")
+
+  UC030a("Geocodifica e ordinamento per prossimità")
+  UC030b("Salvataggio del risultato tra i preferiti")
+  UC031a("Simulazione animata del viaggio")
+  UC032a("Guida vocale e indicazioni visive")
+  UC032b("Ricalcolo automatico in caso di deviazione")
+  UC033a("Comandi vocali in modalità hands-free")
+end
+
+UtenteAutenticato --|> Utente
+
+Utente --> UC030
+UtenteAutenticato --> UC031
+UtenteAutenticato --> UC032
+UtenteAutenticato --> UC033
+
+UC030 ..> : include UC030a
+UC030a --> ServizioGeocoding
+UC032 ..> : include UC016
+UC032 ..> : include UC009
+UC032 ..> : include UC032a
+UC033 --> SistemaInfotainment
+
+UC030b ..> : extend UC005
+UC031 ..> : extend UC016
+UC031a ..> : extend UC031
+UC032b ..> : extend UC032
+UC033 ..> : extend UC032
+UC033a ..> : extend UC033
+```
+
+#### Use case UC-030: Ricerca indirizzi e punti di interesse
+**Riassunto:** Consente di cercare indirizzi, toponimi e punti di interesse sul territorio e di visualizzarne i risultati sulla mappa.
+
+**Descrizione:**
+1. L'utente inserisce nella barra di ricerca un indirizzo, un toponimo o il nome di un punto di interesse.
+2. Il sistema interroga il Servizio di Geocoding e ordina i risultati per prossimità alla posizione corrente o all'area visualizzata.
+3. Il sistema mostra i risultati in elenco e li evidenzia sulla mappa.
+4. L'utente seleziona un risultato e ne consulta la scheda di dettaglio.
+
+**Eccezioni:**
+1. Nessun risultato corrispondente: il sistema segnala l'assenza di corrispondenze e propone ricerche alternative.
+2. Servizio di Geocoding non raggiungibile: il sistema limita la ricerca ai dati memorizzati in locale, segnalandone la parzialità.
+
+**Estensioni:**
+1. Avvio della navigazione verso il risultato selezionato (UC-016).
+2. Salvataggio della località tra i luoghi preferiti (UC-005).
+
+#### Use case UC-031: Anteprima e simulazione del percorso
+**Riassunto:** Permette di visualizzare in anteprima l'itinerario calcolato e, facoltativamente, di simularne la percorrenza prima della partenza.
+
+**Descrizione:**
+1. Dopo il calcolo dell'itinerario (UC-016) l'utente seleziona l'anteprima del percorso.
+2. Il sistema mostra il tracciato completo sulla mappa, l'elenco delle manovre, i tempi stimati e le criticità presenti lungo il tragitto.
+3. L'utente scorre le tappe dell'itinerario e confronta le alternative proposte.
+
+**Eccezioni:**
+1. Itinerario non più valido a causa di una chiusura sopravvenuta: il sistema ricalcola il percorso e aggiorna l'anteprima avvisando l'utente.
+
+**Estensioni:**
+1. Avvio della simulazione animata del viaggio, con riproduzione accelerata delle indicazioni stradali.
+
+#### Use case UC-032: Navigazione turn-by-turn
+**Riassunto:** Fornisce indicazioni vocali e visive passo-passo durante la guida, aggiornandole in tempo reale in base alla posizione dell'utente.
+
+**Descrizione:**
+1. L'utente avvia la navigazione sull'itinerario selezionato (include UC-016).
+2. Il sistema traccia la posizione in tempo reale (include UC-009) e presenta la manovra successiva in forma vocale e visiva.
+3. Il sistema aggiorna progressivamente le istruzioni, i tempi di arrivo e gli avvisi sulle criticità lungo il percorso.
+4. Al raggiungimento della destinazione il sistema conclude la sessione di navigazione.
+
+**Eccezioni:**
+1. Perdita del segnale GPS: il sistema sospende le indicazioni, avvisa l'utente e riprende alla riacquisizione della posizione.
+2. Assenza di connettività: la navigazione prosegue sui dati memorizzati in locale (UC-023), senza aggiornamenti sul traffico.
+
+**Estensioni:**
+1. Ricalcolo automatico dell'itinerario in caso di deviazione dal percorso o di nuova criticità convalidata.
+2. Proiezione dell'interfaccia sul sistema di infotainment del veicolo (UC-033).
+
+#### Use case UC-033: Integrazione con sistemi di infotainment veicolari
+**Riassunto:** Proietta l'interfaccia di navigazione su Android Auto e Apple CarPlay, rendendo accessibili le funzioni essenziali in modalità hands-free.
+
+**Descrizione:**
+1. L'utente collega il dispositivo mobile al sistema di infotainment del veicolo.
+2. Il sistema riconosce la piattaforma e adatta l'interfaccia di navigazione al display del veicolo.
+3. L'utente consulta mappa e indicazioni e utilizza le funzioni essenziali (navigazione, invio di una segnalazione, silenziamento della guida vocale) tramite i comandi del veicolo.
+
+**Eccezioni:**
+1. Piattaforma di infotainment non supportata o connessione interrotta: la navigazione prosegue sul dispositivo mobile e il sistema avvisa l'utente.
+2. Funzionalità non ammesse durante la guida: il sistema le disabilita e le rende disponibili solo a veicolo fermo.
+
+**Estensioni:**
+1. Interazione tramite comandi vocali per avviare la navigazione o inviare una segnalazione senza distogliere l'attenzione dalla guida.
+
+---
+
 ### Utente Autenticato — Contributi alla community
 - UC-011: Cronologia delle segnalazioni — RF-011
 - UC-014: Invio segnalazioni in tempo reale — RF-014
@@ -580,6 +796,83 @@ UC025a ..> : extend UC025
 
 **Estensioni:**
 1. Condivisione dei badge ottenuti sui canali social dell'utente.
+
+---
+
+### Utente Autenticato — Notifiche avanzate
+- UC-040: Gestione avanzata delle notifiche — RF-040
+- UC-041: Notifiche contestuali multicanale — RF-041
+
+```mermaid
+usecase-beta
+direction LR
+
+actor UtenteAutenticato("Utente Autenticato")
+actor ServizioEmail("Servizio Email")
+actor ServizioSMS("Servizio SMS")
+
+systemBoundary NoJam["NoJam"]
+  UC040("UC-040: Gestione avanzata delle notifiche")
+  UC041("UC-041: Notifiche contestuali multicanale")
+  UC010("UC-010: Gestione del canale di notifiche")
+  UC021("UC-021: Notifiche e allerte preventive di mobilità")
+  UC027("UC-027: Gestione eventi straordinari ed emergenze")
+
+  UC040a("Impostazione del raggio di prossimità")
+  UC040b("Definizione delle fasce orarie di silenzio")
+  UC040c("Sospensione temporanea delle notifiche")
+  UC041a("Selezione del canale in base alla priorità")
+  UC041b("Fallback su SMS in assenza di connessione dati")
+end
+
+UtenteAutenticato --> UC010
+UtenteAutenticato --> UC040
+
+UC040 ..> : include UC040a
+UC040 ..> : include UC040b
+UC041 ..> : include UC040
+UC041 ..> : include UC041a
+UC021 ..> : include UC041
+UC027 ..> : include UC041
+
+UC041 --> ServizioEmail
+UC041 --> ServizioSMS
+
+UC040 ..> : extend UC010
+UC040c ..> : extend UC040
+UC041b ..> : extend UC041
+```
+
+#### Use case UC-040: Gestione avanzata delle notifiche
+**Riassunto:** Consente all'utente di configurare in dettaglio tipologia di evento, canale, raggio di prossimità e fasce orarie di silenzio delle notifiche ricevute.
+
+**Descrizione:**
+1. L'utente accede alle impostazioni avanzate del centro notifiche (UC-010).
+2. L'utente associa a ciascuna tipologia di evento (cantieri, emergenze, piano neve, esiti delle proprie segnalazioni) i canali desiderati.
+3. L'utente imposta il raggio di prossimità entro cui ricevere gli avvisi e le fasce orarie di silenzio.
+4. Il sistema salva la configurazione e la applica agli invii successivi.
+
+**Eccezioni:**
+1. Configurazione che escluderebbe anche le allerte di emergenza: il sistema avvisa che le notifiche critiche vengono comunque recapitate.
+2. Errore di salvataggio lato server: il sistema mantiene la configurazione precedente e invita a ritentare.
+
+**Estensioni:**
+1. Sospensione temporanea di tutte le notifiche non critiche per un intervallo scelto dall'utente.
+
+#### Use case UC-041: Notifiche contestuali multicanale
+**Riassunto:** Recapita le notifiche su push, email o SMS in base alla natura dell'evento e alle preferenze dell'utente, garantendo la comunicazione anche senza connessione dati attiva.
+
+**Descrizione:**
+1. Il sistema genera una notifica a seguito di un evento rilevante (UC-021, UC-027) o dell'esito di una segnalazione.
+2. Il sistema determina il canale di recapito incrociando la priorità dell'evento con le preferenze configurate in UC-040.
+3. Il sistema invia il messaggio tramite notifica push, Servizio Email o Servizio SMS e ne registra l'esito di consegna.
+
+**Eccezioni:**
+1. Push non recapitabile per assenza di connessione dati: il sistema ricade sul canale SMS per gli eventi ad alta priorità.
+2. Canale esterno non disponibile o recapito fallito: il sistema ritenta l'invio e mantiene l'avviso nel centro notifiche in-app.
+
+**Estensioni:**
+1. Riepilogo periodico via email degli avvisi non letti.
 
 ---
 
@@ -705,6 +998,105 @@ UC027a ..> : extend UC027
 
 **Estensioni:**
 1. Disattivazione e archiviazione dell'evento al ripristino delle condizioni di sicurezza.
+
+---
+
+### Amministratore PA — Ruoli, audit e importazione dati
+- UC-034: Gestione ruoli e permessi degli operatori — RF-034
+- UC-035: Log di audit operativi — RF-035
+- UC-036: Importazione massiva dati — RF-036
+
+```mermaid
+usecase-beta
+direction LR
+
+actor AmministratorePA("Amministratore PA")
+actor OperatorePA("Operatore PA")
+actor EnteTerritoriale("Ente Territoriale")
+
+systemBoundary NoJam["NoJam"]
+  UC034("UC-034: Gestione ruoli e permessi degli operatori")
+  UC035("UC-035: Log di audit operativi")
+  UC036("UC-036: Importazione massiva dati")
+  UC006("UC-006: Gestione dei permessi")
+  UC019("UC-019: Pannello di gestione e Smart Governance")
+
+  UC034a("Definizione di ruoli personalizzati")
+  UC034b("Revoca immediata delle abilitazioni")
+  UC035a("Filtro del registro per operatore e periodo")
+  UC035b("Esportazione del registro di audit")
+  UC036a("Validazione e anteprima dei record importati")
+  UC036b("Annullamento dell'importazione")
+end
+
+AmministratorePA --|> OperatorePA
+
+AmministratorePA --> UC034
+AmministratorePA --> UC035
+OperatorePA --> UC036
+EnteTerritoriale --> UC036
+
+UC034 ..> : include UC034a
+UC034 ..> : include UC006
+UC035 ..> : include UC035a
+UC036 ..> : include UC036a
+UC036 ..> : include UC035
+UC034 ..> : include UC035
+UC019 ..> : include UC035
+
+UC034b ..> : extend UC034
+UC035b ..> : extend UC035
+UC036b ..> : extend UC036
+UC036 ..> : extend UC019
+```
+
+#### Use case UC-034: Gestione ruoli e permessi degli operatori
+**Riassunto:** Consente all'Amministratore PA di definire ruoli personalizzati e di assegnare agli operatori permessi granulari sulle funzioni della dashboard.
+
+**Descrizione:**
+1. L'Amministratore PA accede alla sezione di amministrazione degli accessi.
+2. L'amministratore crea o modifica un ruolo, selezionando i permessi granulari da concedere (lettura, inserimento, modifica, validazione, pubblicazione).
+3. L'amministratore assegna il ruolo agli operatori accreditati dell'ente.
+4. Il sistema applica le abilitazioni aggiornate al controllo dei permessi (include UC-006) e registra l'operazione nel log di audit (UC-035).
+
+**Eccezioni:**
+1. Rimozione dell'ultimo ruolo con privilegi amministrativi: il sistema blocca l'operazione per evitare la perdita del controllo sull'ente.
+2. Operatore con attività in corso al momento della modifica: le nuove abilitazioni si applicano dalla sessione successiva e il sistema ne dà evidenza.
+
+**Estensioni:**
+1. Revoca immediata di tutte le abilitazioni di un operatore con chiusura forzata delle sue sessioni attive.
+
+#### Use case UC-035: Log di audit operativi
+**Riassunto:** Registra in forma non modificabile le azioni eseguite dagli operatori PA, garantendo tracciabilità e responsabilità degli interventi sulla viabilità.
+
+**Descrizione:**
+1. Il sistema intercetta ogni azione rilevante eseguita da un operatore (inserimento, modifica, validazione, pubblicazione, importazione, cambio di ruolo).
+2. Il sistema registra autore, ruolo, tipologia di azione, oggetto interessato, data e ora, in un archivio non modificabile.
+3. L'Amministratore PA consulta il registro filtrandolo per operatore, tipologia di azione o intervallo temporale.
+
+**Eccezioni:**
+1. Tentativo di modifica o cancellazione di una voce del registro: il sistema rifiuta l'operazione e ne traccia il tentativo.
+2. Archivio di audit non scrivibile: il sistema blocca l'azione operativa in corso per non produrre interventi non tracciati.
+
+**Estensioni:**
+1. Esportazione del registro di audit in formato CSV o PDF per verifiche e adempimenti ispettivi.
+
+#### Use case UC-036: Importazione massiva dati
+**Riassunto:** Permette agli operatori PA di caricare in blocco cantieri, ordinanze, chiusure e piani neve tramite file in formato standard.
+
+**Descrizione:**
+1. L'Operatore PA seleziona la funzione di importazione massiva dalla dashboard e carica un file CSV, GeoJSON o Shapefile.
+2. Il sistema analizza il file, valida i record rispetto al modello dati e mostra un'anteprima con le righe conformi e quelle scartate.
+3. L'operatore conferma l'importazione.
+4. Il sistema registra i dati, li propaga alla mappa e al motore di routing e traccia l'operazione nel log di audit (include UC-035).
+
+**Eccezioni:**
+1. Formato del file non supportato o struttura non conforme: il sistema interrompe l'elaborazione e indica gli errori rilevati.
+2. Record in conflitto con dati già presenti: il sistema li segnala e chiede all'operatore se sovrascriverli o ignorarli.
+3. Interruzione durante l'elaborazione: nessun record viene reso effettivo e il sistema riporta l'archivio allo stato precedente.
+
+**Estensioni:**
+1. Annullamento di un'importazione completata entro un intervallo di tempo definito, con ripristino dello stato precedente.
 
 ---
 
