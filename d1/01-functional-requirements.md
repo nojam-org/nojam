@@ -129,3 +129,27 @@ L'utente deve poter configurare in dettaglio le notifiche ricevute (tipologia di
 
 ### RF-041: Notifiche contestuali multicanale
 Il sistema deve inviare notifiche push o email in base alla natura e alla priorità dell'evento e alle preferenze dell'utente, mantenendo in ogni caso gli avvisi consultabili nel centro notifiche in-app.
+
+### RF-042: Cambio lingua
+L'utente deve poter selezionare e cambiare istantaneamente la lingua dell'interfaccia tra Italiano, Inglese e Tedesco. Il sistema deve applicare la nuova lingua a tutti gli elementi dell'interfaccia grafica e ai messaggi di sistema senza necessità di riavvio.
+
+### RF-043: Autenticazione a più fattori per operatori PA
+Il sistema deve richiedere l'autenticazione a più fattori (MFA) agli operatori della Pubblica Amministrazione per l'accesso alle funzionalità amministrative.
+
+### RF-044: Cifratura delle comunicazioni e dei dati sensibili
+Il sistema deve cifrare tutte le comunicazioni tra client, server e servizi terzi utilizzando TLS 1.2 o superiore. I dati sensibili (password, token, posizioni GPS grezze, log di audit) devono essere crittografati a riposo con algoritmi conformi agli standard correnti.
+
+### RF-045: Controllo degli accessi alle funzionalità amministrative
+L'accesso alle funzionalità amministrative da parte degli operatori PA deve essere soggetto a controllo degli accessi basato sui ruoli, garantendo che ciascun operatore possa utilizzare solo le funzioni autorizzate dal proprio profilo.
+
+### RF-046: Backup automatico dei dati critici
+Il sistema deve effettuare backup automatici giornalieri dei dati critici (configurazioni, dati utente, eventi di viabilità, log di audit), con politica di retention conforme alle policy interne e normative. Almeno una copia di backup deve essere mantenuta in una zona geografica diversa da quella di produzione.
+
+### RF-047: Ingestion automatica di dati PA in formati standard
+Il sistema deve essere in grado di ingerire e sincronizzare automaticamente i dati ufficiali provenienti dalla Pubblica Amministrazione nei formati standard CSV, GeoJSON e Shapefile.
+
+### RF-048: Documentazione e formati delle API pubbliche
+Le API pubbliche del sistema devono essere documentate secondo lo standard OpenAPI 3.0 e devono restituire dati in formati JSON e/o GeoJSON.
+
+### RF-049: Integrazione con provider di identità standard
+Il sistema deve supportare l'autenticazione tramite provider di identità che utilizzino protocolli standard come OAuth 2.0, OpenID Connect, SPID e CIE.
