@@ -34,20 +34,15 @@
 | Utente Autenticato | Utente con account attivo; accede alle funzionalità personali e contributive. |
 | Operatore PA | Operatore accreditato del Comune o della Provincia, con accesso alla dashboard di Smart Governance. |
 | Amministratore PA | Operatore PA con privilegi amministrativi; definisce ruoli, permessi e policy di conservazione dei dati. |
-| Moderatore | Ruolo incaricato della verifica dei contenuti inviati dalla community. |
 | Provider di Identità | Sistema esterno di autenticazione (Google SSO, SPID, CIE). |
 | Servizio Email | Sistema esterno per l'invio delle comunicazioni transazionali. |
-| Servizio SMS | Gateway esterno per l'invio di messaggi di testo sulla rete cellulare. |
 | Supporto Tecnico | Team che riceve e gestisce bug report e feedback. |
 | Ente Territoriale | Sorgente dati ufficiale (Comune, Provincia) per cantieri, ordinanze e piani neve. |
-| Mezzo Spazzaneve | Mezzo operativo dotato di trasmettitore GPS. |
 | Servizi Parcheggi e TPL | Sorgenti dati in tempo reale su sosta e trasporto pubblico. |
 | Servizio di Posizione | Sensore GPS e servizio di localizzazione del dispositivo. |
 | Servizio di Geocoding | Sorgente esterna di toponomastica e punti di interesse del territorio. |
 | Sistema di Infotainment | Piattaforma veicolare esterna (Android Auto, Apple CarPlay) su cui viene proiettata l'interfaccia di navigazione. |
 | Sistema Terzo | Applicativo o portale istituzionale che consuma le API Open Data. |
-
----
 
 ### Utente Anonimo
 - UC-001: Registrazione utente — RF-001
@@ -138,7 +133,7 @@ UC017a ..> : extend UC017
 1. Tentativo di accesso a funzionalità riservate da parte di un utente non autorizzato: il sistema blocca l'operazione e richiede l'autenticazione.
 
 **Estensioni:**
-1. Richiesta di elevazione del ruolo a Operatore PA o Moderatore, soggetta ad approvazione.
+1. Richiesta di elevazione del ruolo a Operatore PA, soggetta ad approvazione.
 
 #### Use case UC-017: Consultazione mappa interattiva ed eventi
 **Riassunto:** Permette la libera consultazione della mappa del territorio con evidenza di traffico, cantieri, ordinanze e allerte.
@@ -153,8 +148,6 @@ UC017a ..> : extend UC017
 
 **Estensioni:**
 1. Filtro dei livelli e delle categorie di contenuto visualizzati sulla mappa.
-
----
 
 ### Utente Autenticato — Account e privacy
 - UC-003: Gestione del profilo — RF-003
@@ -317,8 +310,6 @@ UC008a --> ServizioEmail
 **Estensioni:**
 1. Invio di un'email di conferma dell'avvenuta eliminazione.
 
----
-
 ### Utente — Consensi e conformità normativa
 - UC-037: Accettazione dei termini e condizioni — RF-037
 - UC-038: Gestione consensi cookie e GDPR — RF-038
@@ -409,8 +400,6 @@ UC039b ..> : extend UC039
 
 **Estensioni:**
 1. Configurazione dei periodi di conservazione per tipologia di dato da parte dell'Amministratore PA.
-
----
 
 ### Utente Autenticato — Mappa e navigazione
 - UC-005: Gestione luoghi e percorsi salvati — RF-005
@@ -575,8 +564,6 @@ UC028a ..> : extend UC028
 **Estensioni:**
 1. Salvataggio del viaggio pianificato con promemoria automatico prima della partenza.
 
----
-
 ### Utente — Ricerca e navigazione assistita
 - UC-030: Ricerca indirizzi e punti di interesse — RF-030
 - UC-031: Anteprima e simulazione del percorso — RF-031
@@ -694,8 +681,6 @@ UC033a ..> : extend UC033
 **Estensioni:**
 1. Interazione tramite comandi vocali per avviare la navigazione o inviare una segnalazione senza distogliere l'attenzione dalla guida.
 
----
-
 ### Utente Autenticato — Contributi alla community
 - UC-011: Cronologia delle segnalazioni — RF-011
 - UC-014: Invio segnalazioni in tempo reale — RF-014
@@ -771,7 +756,7 @@ UC025a ..> : extend UC025
 **Riassunto:** Incrocia le segnalazioni degli utenti con i dati ufficiali della PA e con le segnalazioni concorrenti per calcolare il peso dell'evento e aggiornare la reputazione del segnalatore.
 
 **Descrizione:**
-1. Il sistema riceve una nuova segnalazione, inviata da un utente (UC-014) o esitata da un moderatore (UC-022).
+1. Il sistema riceve una nuova segnalazione inviata da un utente (UC-014) o rivaluta una segnalazione già attiva a seguito della moderazione automatica (UC-022).
 2. Il sistema la incrocia con i dati ufficiali della PA e con le altre segnalazioni presenti nella stessa area spazio-temporale.
 3. Il sistema assegna un indice di affidabilità all'evento e aggiorna di conseguenza il punteggio di reputazione dell'utente segnalatore.
 
@@ -797,8 +782,6 @@ UC025a ..> : extend UC025
 **Estensioni:**
 1. Condivisione dei badge ottenuti sui canali social dell'utente.
 
----
-
 ### Utente Autenticato — Notifiche avanzate
 - UC-040: Gestione avanzata delle notifiche — RF-040
 - UC-041: Notifiche contestuali multicanale — RF-041
@@ -809,7 +792,6 @@ direction LR
 
 actor UtenteAutenticato("Utente Autenticato")
 actor ServizioEmail("Servizio Email")
-actor ServizioSMS("Servizio SMS")
 
 systemBoundary NoJam["NoJam"]
   UC040("UC-040: Gestione avanzata delle notifiche")
@@ -822,7 +804,7 @@ systemBoundary NoJam["NoJam"]
   UC040b("Definizione delle fasce orarie di silenzio")
   UC040c("Sospensione temporanea delle notifiche")
   UC041a("Selezione del canale in base alla priorità")
-  UC041b("Fallback su SMS in assenza di connessione dati")
+  UC041b("Riepilogo periodico via email degli avvisi non letti")
 end
 
 UtenteAutenticato --> UC010
@@ -836,7 +818,6 @@ UC021 ..> : include UC041
 UC027 ..> : include UC041
 
 UC041 --> ServizioEmail
-UC041 --> ServizioSMS
 
 UC040 ..> : extend UC010
 UC040c ..> : extend UC040
@@ -860,25 +841,23 @@ UC041b ..> : extend UC041
 1. Sospensione temporanea di tutte le notifiche non critiche per un intervallo scelto dall'utente.
 
 #### Use case UC-041: Notifiche contestuali multicanale
-**Riassunto:** Recapita le notifiche su push, email o SMS in base alla natura dell'evento e alle preferenze dell'utente, garantendo la comunicazione anche senza connessione dati attiva.
+**Riassunto:** Recapita le notifiche su push o email in base alla natura e alla priorità dell'evento e alle preferenze dell'utente.
 
 **Descrizione:**
 1. Il sistema genera una notifica a seguito di un evento rilevante (UC-021, UC-027) o dell'esito di una segnalazione.
 2. Il sistema determina il canale di recapito incrociando la priorità dell'evento con le preferenze configurate in UC-040.
-3. Il sistema invia il messaggio tramite notifica push, Servizio Email o Servizio SMS e ne registra l'esito di consegna.
+3. Il sistema invia il messaggio tramite notifica push o Servizio Email e ne registra l'esito di consegna.
 
 **Eccezioni:**
-1. Push non recapitabile per assenza di connessione dati: il sistema ricade sul canale SMS per gli eventi ad alta priorità.
-2. Canale esterno non disponibile o recapito fallito: il sistema ritenta l'invio e mantiene l'avviso nel centro notifiche in-app.
+1. Dispositivo privo di connessione dati: la notifica push viene recapitata alla riconnessione e l'avviso resta disponibile nel centro notifiche in-app.
+2. Canale non disponibile o recapito fallito: il sistema ritenta l'invio e mantiene l'avviso nel centro notifiche in-app.
 
 **Estensioni:**
 1. Riepilogo periodico via email degli avvisi non letti.
 
----
-
 ### Operatore PA
 - UC-013: Ingestion e sincronizzazione dati ufficiali PA — RF-013
-- UC-018: Gestione del piano neve e tracciamento mezzi — RF-018
+- UC-018: Gestione del piano neve — RF-018
 - UC-019: Pannello di gestione e Smart Governance — RF-019
 - UC-020: Analisi aggregate e reporting del traffico — RF-020
 - UC-027: Gestione eventi straordinari ed emergenze — RF-027
@@ -889,12 +868,12 @@ direction LR
 
 actor OperatorePA("Operatore PA")
 actor EnteTerritoriale("Ente Territoriale")
-actor MezzoSpazzaneve("Mezzo Spazzaneve")
 actor UtenteAutenticato("Utente Autenticato")
 
 systemBoundary NoJam["NoJam"]
   UC013("UC-013: Ingestion e sincronizzazione dati ufficiali PA")
-  UC018("UC-018: Gestione del piano neve e tracciamento mezzi")
+  UC018("UC-018: Gestione del piano neve")
+  UC014("UC-014: Invio segnalazioni in tempo reale")
   UC019("UC-019: Pannello di gestione e Smart Governance")
   UC020("UC-020: Analisi aggregate e reporting del traffico")
   UC027("UC-027: Gestione eventi straordinari ed emergenze")
@@ -902,24 +881,25 @@ systemBoundary NoJam["NoJam"]
 
   UC013a("Parsing di cantieri, chiusure e ordinanze")
   UC013b("Parsing dei piani di sgombero neve")
-  UC018a("Tracciamento GPS dei mezzi operativi")
+  UC018a("Aggiornamento dello stato di avanzamento delle tratte")
   UC019a("Pubblicazione di ordinanze e cantieri")
   UC020a("Esportazione dei report in PDF o CSV")
   UC027a("Archiviazione dell'evento di emergenza")
 end
 
 EnteTerritoriale --> UC013
-MezzoSpazzaneve --> UC018
 OperatorePA --> UC018
 OperatorePA --> UC019
 OperatorePA --> UC020
 OperatorePA --> UC027
+UtenteAutenticato --> UC014
 UtenteAutenticato --> UC021
 
 UC013 ..> : include UC013a
 UC013 ..> : include UC013b
 UC018 ..> : include UC013b
 UC018 ..> : include UC018a
+UC014 ..> : extend UC018a
 UC019 ..> : include UC019a
 UC027 ..> : include UC021
 
@@ -943,19 +923,22 @@ UC027a ..> : extend UC027
 **Estensioni:**
 1. Notifica all'Operatore PA in caso di discrepanze o scarti rilevanti nei dati importati.
 
-#### Use case UC-018: Gestione del piano neve e tracciamento mezzi
-**Riassunto:** Permette la pianificazione dello sgombero neve e la visualizzazione in tempo reale delle rotte e della posizione dei mezzi spazzaneve.
+#### Use case UC-018: Gestione del piano neve
+**Riassunto:** Permette la pianificazione dello sgombero neve e la visualizzazione dei percorsi programmati e dello stato di avanzamento delle operazioni.
 
 **Descrizione:**
-1. L'Operatore PA carica o aggiorna la pianificazione delle tratte di sgombero.
-2. Il sistema acquisisce la posizione GPS trasmessa dai mezzi operativi.
-3. Il sistema mostra sulla mappa la pianificazione aggiornata e lo stato di pulizia delle strade.
+1. L'Operatore PA carica o aggiorna la pianificazione delle tratte di sgombero e la relativa fascia oraria di intervento.
+2. Il sistema mostra sulla mappa i percorsi programmati e lo stato dichiarato di ciascuna tratta (da effettuare, in corso, completata).
+3. L'Operatore PA aggiorna lo stato di avanzamento delle tratte durante le operazioni.
+4. Il sistema aggiorna la mappa pubblica e il motore di routing con lo stato più recente.
 
 **Eccezioni:**
-1. Trasmettitore GPS di un mezzo disconnesso: il sistema mostra la posizione come "ultimo aggiornamento noto" con il relativo orario.
+1. Stato di una tratta non aggiornato oltre la fascia oraria prevista: il sistema lo presenta come "non confermato", indicando l'orario dell'ultimo aggiornamento.
+2. Piano neve non pubblicato dall'ente per la stagione in corso: il sistema mostra la sola mappa delle zone di intervento storiche, segnalandone la natura indicativa.
 
 **Estensioni:**
-1. Invio di notifiche dedicate agli utenti delle zone interessate dai passaggi imminenti (UC-021).
+1. Aggiornamento dello stato di una tratta a partire dalle segnalazioni di passaggio inviate dagli utenti e convalidate dal sistema (UC-014, UC-015).
+2. Invio di notifiche dedicate agli utenti delle zone interessate dagli interventi programmati (UC-021).
 
 #### Use case UC-019: Pannello di gestione e Smart Governance
 **Riassunto:** Mette a disposizione degli operatori accreditati una dashboard amministrativa per pubblicare ordinanze, gestire cantieri e supervisionare la viabilità.
@@ -998,8 +981,6 @@ UC027a ..> : extend UC027
 
 **Estensioni:**
 1. Disattivazione e archiviazione dell'evento al ripristino delle condizioni di sicurezza.
-
----
 
 ### Amministratore PA — Ruoli, audit e importazione dati
 - UC-034: Gestione ruoli e permessi degli operatori — RF-034
@@ -1098,51 +1079,54 @@ UC036 ..> : extend UC019
 **Estensioni:**
 1. Annullamento di un'importazione completata entro un intervallo di tempo definito, con ripristino dello stato precedente.
 
----
-
-### Moderatore
-- UC-022: Moderazione e gestione dei contenuti — RF-022
+### Moderazione automatica
+- UC-022: Moderazione automatica dei contenuti — RF-022
 
 ```mermaid
 usecase-beta
 direction LR
 
-actor Moderatore("Moderatore")
-actor OperatorePA("Operatore PA")
+actor UtenteAutenticato("Utente Autenticato")
 
 systemBoundary NoJam["NoJam"]
-  UC022("UC-022: Moderazione e gestione dei contenuti")
+  UC022("UC-022: Moderazione automatica dei contenuti")
+  UC014("UC-014: Invio segnalazioni in tempo reale")
   UC015("UC-015: Valutazione affidabilità e reputation scoring")
 
-  UC022a("Presa in carico della coda di segnalazioni")
-  UC022b("Blocco dell'utente segnalatore")
+  UC022a("Conferma di una segnalazione già attiva")
+  UC022b("Decadimento della segnalazione non confermata")
+  UC022c("Rimozione della segnalazione smentita")
+  UC022d("Limitazione dei contributi di un utente poco affidabile")
 end
 
-OperatorePA --|> Moderatore
+UtenteAutenticato --> UC014
 
-Moderatore --> UC022
-
-UC022 ..> : include UC022a
+UC014 ..> : include UC022
 UC022 ..> : include UC015
+UC022 ..> : include UC022b
 
-UC022b ..> : extend UC022
+UC022a ..> : extend UC022
+UC022c ..> : extend UC022
+UC022d ..> : extend UC015
 ```
 
-#### Use case UC-022: Moderazione e gestione dei contenuti
-**Riassunto:** Consente a moderatori e operatori PA di confermare, correggere o rimuovere le segnalazioni errate, obsolete o improprie inviate dalla community.
+#### Use case UC-022: Moderazione automatica dei contenuti
+**Riassunto:** Determina automaticamente la validità delle segnalazioni della community sulla base delle conferme concordanti, dei dati ufficiali e del tempo trascorso, senza intervento di moderatori umani.
 
 **Descrizione:**
-1. Il moderatore accede alla coda delle segnalazioni attive e ne prende in carico una.
-2. Il moderatore valuta l'accuratezza dell'informazione e sceglie se confermarla, modificarla o rimuoverla.
-3. Il sistema aggiorna la mappa e trasmette l'esito all'algoritmo di reputazione (include UC-015) per aggiornare il punteggio dell'utente segnalatore.
+1. Il sistema riceve una nuova segnalazione (UC-014) oppure rivaluta periodicamente quelle già attive.
+2. Il sistema conta le segnalazioni concordanti presenti nella stessa area spazio-temporale e le confronta con i dati ufficiali della PA (UC-015): maggiore è il numero di conferme, maggiore è l'affidabilità attribuita all'avviso.
+3. Al superamento della soglia di affidabilità, il sistema promuove la segnalazione a convalidata e la rende utilizzabile dalla mappa e dal motore di routing.
+4. In assenza di conferme entro il tempo di validità previsto per la tipologia di evento, il sistema fa decadere la segnalazione e la rimuove dalla mappa.
 
 **Eccezioni:**
-1. Segnalazione già presa in carico da un altro operatore: il sistema notifica il conflitto e non consente la doppia moderazione.
+1. Segnalazione smentita dai dati ufficiali o da segnalazioni successive concordanti: il sistema la rimuove immediatamente e applica una penalità alla reputazione del segnalatore (UC-015).
+2. Segnalazione isolata proveniente da un utente ad alta reputazione: il sistema la mantiene visibile con un livello di affidabilità ridotto ed esplicitato all'utente.
 
 **Estensioni:**
-1. Blocco temporaneo o permanente degli utenti che inviano ripetutamente segnalazioni ingannevoli.
-
----
+1. Conferma esplicita di una segnalazione già attiva da parte di un altro utente, che ne incrementa l'affidabilità e ne prolunga la validità.
+2. Intervento manuale di un Operatore PA sulla singola segnalazione dalla dashboard, in quanto fonte autorevole (UC-019).
+3. Limitazione automatica dei contributi degli utenti la cui reputazione scende sotto la soglia minima prevista.
 
 ### Sistemi esterni
 - UC-026: Esportazione ed API dati aperti (Open Data) — RF-026

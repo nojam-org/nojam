@@ -58,8 +58,8 @@ Il sistema deve calcolare e proporre itinerari di navigazione che tengano conto 
 ### RF-017: Consultazione mappa interattiva ed eventi
 Il sistema deve consentire sia agli utenti autenticati che a quelli non autenticati di consultare la mappa interattiva del territorio, visualizzando lo stato del traffico, i cantieri attivi, i dettagli delle ordinanze comunali, i percorsi dello sgombero neve e le allerte confermate.
 
-### RF-018: Gestione del piano neve e tracciamento mezzi
-Il sistema deve gestire la mappa e la pianificazione dello sgombero neve, permettendo la visualizzazione dei percorsi degli spazzaneve.
+### RF-018: Gestione del piano neve
+Il sistema deve gestire la mappa e la pianificazione dello sgombero neve, permettendo la visualizzazione dei percorsi programmati e dello stato di avanzamento delle operazioni. Lo stato di avanzamento è aggiornato dagli operatori della PA e dalle segnalazioni della community, senza tracciamento in tempo reale dei mezzi operativi.
 
 ### RF-019: Pannello di gestione e Smart Governance per la PA
 Il sistema deve mettere a disposizione degli operatori accreditati del Comune e della Provincia una dashboard amministrativa per pubblicare ordinanze, inserire o modificare manualmente cantieri ed emergenze, validare segnalazioni e supervisionare la viabilità.
@@ -70,8 +70,8 @@ Il sistema deve elaborare ed evidenziare dati aggregati ed anonimizzati sui flus
 ### RF-021: Notifiche e allerte preventive di mobilità
 Il sistema deve inviare notifiche push o alert di prossimità tempestivi per avvisare gli utenti di cantieri programmati lungo i percorsi salvati o chiusure stradali improvvise prima dell'inizio del viaggio.
 
-### RF-022: Moderazione e gestione dei contenuti
-Il sistema deve permettere agli operatori PA o ai moderatori di confermare, modificare, annullare o rimuovere segnalazioni errate, obsolete o improprie inviate dagli utenti.
+### RF-022: Moderazione automatica dei contenuti
+Il sistema deve determinare automaticamente la validità delle segnalazioni inviate dagli utenti, senza intervento di moderatori umani: più segnalazioni concordanti sono presenti nella stessa area spazio-temporale, maggiore è l'affidabilità attribuita all'avviso. Il sistema deve confermare le segnalazioni corroborate, far decadere quelle non confermate entro i tempi previsti e rimuovere quelle smentite dai dati ufficiali o dalle segnalazioni successive. Resta ferma la facoltà degli operatori PA di intervenire manualmente sulle singole segnalazioni dalla dashboard, in quanto fonte autorevole (RF-019).
 
 ### RF-023: Modalità di guida offline parziale
 Il sistema deve consentire il salvataggio in locale (caching) delle mappe e dei percorsi frequenti per garantirne la consultazione e il routing base anche in caso di disconnessione o copertura di rete limitata.
@@ -128,4 +128,4 @@ Il sistema deve applicare automaticamente le politiche di conservazione dei dati
 L'utente deve poter configurare in dettaglio le notifiche ricevute (tipologia di evento, canale, raggio di prossimità, fasce orarie di silenzio), nonché disattivarle temporaneamente.
 
 ### RF-041: Notifiche contestuali multicanale
-Il sistema deve inviare notifiche push, email o SMS in base alla natura dell'evento e alle preferenze dell'utente, garantendo la comunicazione anche in assenza di connessione dati attiva sull'app.
+Il sistema deve inviare notifiche push o email in base alla natura e alla priorità dell'evento e alle preferenze dell'utente, mantenendo in ogni caso gli avvisi consultabili nel centro notifiche in-app.
