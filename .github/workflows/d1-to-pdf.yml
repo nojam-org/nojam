@@ -1,0 +1,131 @@
+name: build d1 pdf
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-24.04
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-lang-italian
+          sudo npm install --global @mermaid-js/mermaid-cli@11
+
+      - name: write configs and cover/toc
+        run: |
+          mkdir -p build/d1
+          cat > build/mermaid-config.json <<'EOF'
+          {
+            "theme": "base",
+            "themeVariables": {
+              "fontFamily": "sans-serif",
+              "fontSize": "16px",
+              "primaryColor": "#e8f1fb",
+              "primaryBorderColor": "#1f4e79",
+              "primaryTextColor": "#1a1a1a",
+              "lineColor": "#1f4e79"
+            }
+          }
+          EOF
+          cat > build/puppeteer-config.json <<'EOF'
+          {
+            "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+          }
+          EOF
+          cat > build/d1/cover.md <<'EOF'
+          ```{=latex}
+          \begin{titlepage}
+          \thispagestyle{empty}
+          \centering
+          \vspace*{1cm}
+          \includegraphics[width=0.45\textwidth]{assets/logo.png}\\[1.2cm]
+          {\fontsize{34}{40}\selectfont\bfseries NoJam\par}
+          \vspace{0.6cm}
+          {\Large Deliverable D1: Specifica dei requisiti\par}
+          \vspace{2.5cm}
+          {\large\bfseries Autori\par}
+          \vspace{0.3cm}
+          {\large Emiliano Rizzonelli\\Simone Leveghi\\Riccardo Marchignoli\par}
+          \vfill
+          \IfFileExists{assets/logo-unitn.png}{\includegraphics[height=2cm]{assets/logo-unitn.png}}{}\hspace{2cm}
+          \IfFileExists{assets/logo-comune-trento.png}{\includegraphics[height=2cm]{assets/logo-comune-trento.png}}{}
+          \end{titlepage}
+          ```
+          EOF
+          cat > build/d1/toc.md <<'EOF'
+          ```{=latex}
+          \clearpage
+          \renewcommand\contentsname{Indice}
+          \setcounter{tocdepth}{0}
+          \tableofcontents
+          \clearpage
+          ```
+          EOF
+
+      - name: stage d1 sources and render diagrams
+        run: |
+          mkdir -p build/d1/diagrams build/d1/assets
+          cp -R d1/assets/. build/d1/assets/
+          cp -R assets/. build/d1/assets/
+          for md in d1/*.md; do
+            base=$(basename "$md" .md)
+            awk -v out="build/d1" -v base="$base" '
+              /^```mermaid[ \t]*$/ {
+                inblock = 1
+                n++
+                file = sprintf("%s/diagrams/%s-%02d.mmd", out, base, n)
+                printf "" > file
+                next
+              }
+              inblock && /^```[ \t]*$/ {
+                inblock = 0
+                close(file)
+                printf "![](diagrams/%s-%02d.pdf)\n", base, n
+                next
+              }
+              inblock { print > file; next }
+              { print }
+            ' "$md" > "build/d1/$base.md"
+          done
+          for mmd in build/d1/diagrams/*.mmd; do
+            mmdc \
+              -c build/mermaid-config.json \
+              -p build/puppeteer-config.json \
+              -b white \
+              -i "$mmd" \
+              -o "${mmd%.mmd}.pdf"
+          done
+
+      - name: build pdf
+        working-directory: build/d1
+        run: |
+          pandoc cover.md 00-overview.md toc.md \
+            01-functional-requirements.md \
+            02-non-functional-requirements.md \
+            03-use-cases.md \
+            04-user-stories.md \
+            05-design-frontend.md \
+            06-traceability.md \
+            --from markdown \
+            --pdf-engine=xelatex \
+            -V documentclass=book \
+            -V classoption=oneside \
+            -V classoption=openany \
+            -V lang=it \
+            -V geometry:margin=1in \
+            -o "$GITHUB_WORKSPACE/build/nojam-d1-$TAG.pdf"
+
+      - name: attach pdf to release
+        run: gh release upload "$TAG" "build/nojam-d1-$TAG.pdf" --clobber
