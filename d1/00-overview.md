@@ -16,7 +16,7 @@ Trento rappresenta il nostro campo di prova e il laboratorio ideale per densità
 
 ### Vantaggi per il comune
 - **Smart governance della mobilità:** il Comune e la Provincia dispongono di un canale diretto per pubblicare ordinanze, cantieri, deviazioni e allerte neve, orchestrando la viabilità in modo proattivo anziché reattivo.
-- **Decisioni basate sui dati:** l’incrocio tra dati ufficiali e segnalazioni degli utenti fornisce al territorio analitiche <!-- TODO: is that how you say it??? -->aggregate sul traffico e sulle criticità, a supporto della pianificazione urbana e della gestione delle emergenze.
+- **Decisioni basate sui dati:** l’incrocio tra dati ufficiali e segnalazioni degli utenti fornisce al territorio analisi aggregate sul traffico e sulle criticità, a supporto della pianificazione urbana e della gestione delle emergenze.
 - **Valorizzazione del lavoro amministrativo:** le ordinanze e le informazioni già prodotte dagli enti diventano immediatamente fruibili per i cittadini, riducendo confusione, reclami e pressione sui canali istituzionali.
 
 ### Vantaggi per i cittadini
