@@ -39,6 +39,7 @@ Come utente anonimo, voglio poter consultare la mappa interattiva del territorio
 - AC-US002-01: L'utente non autenticato visualizza i livelli di traffico, cantieri attivi, ordinanze comunali e zone del piano neve.
 - AC-US002-02: Se l'utente tenta di accedere a funzionalità riservate (es. invio segnalazioni), il sistema blocca l'operazione e richiede l'autenticazione.
 - AC-US002-03: In assenza di connessione, il sistema mostra l'ultima versione delle tessere della mappa memorizzata in cache.
+- AC-US002-04: La mappa e gli eventi visualizzati si caricano entro 1,5 secondi per il 95% delle richieste.
 
 ---
 
@@ -75,6 +76,7 @@ Come utente autenticato, voglio salvare, modificare ed eliminare luoghi frequent
 - AC-US005-01: L'utente può salvare un luogo o un itinerario assegnandogli un'etichetta personalizzata.
 - AC-US005-02: Il sistema consente la modifica ed eliminazione degli elementi salvati in qualsiasi momento.
 - AC-US005-03: Raggiunto il limite massimo di elementi salvabili, il sistema segnala l'impossibilità di aggiungerne altri senza prima rimuoverne uno esistente.
+- AC-US005-04: L'utente può scaricare in locale mappe e percorsi salvati e, in assenza di connessione, consultarli e ottenere un routing di base.
 
 ---
 
@@ -87,6 +89,7 @@ Come utente autenticato, voglio inserire punto di partenza, destinazione e orari
 - AC-US006-01: Il motore di routing integra cantieri programmati, ordinanze e criticità convalidate in tempo reale per proporre gli itinerari migliori.
 - AC-US006-02: Impostando un orario di partenza futuro, il sistema stima i rallentamenti in base alle ordinanze programmate per quella specifica fascia oraria.
 - AC-US006-03: In caso di chiusura totale del percorso senza alternative percorribili, il sistema notifica l'impossibilità di raggiungere la destinazione.
+- AC-US006-04: L'utente può salvare un viaggio pianificato e ricevere un promemoria automatico prima della partenza.
 
 ---
 
@@ -99,6 +102,8 @@ Come utente guidatore, voglio ricevere indicazioni vocali e visive passo-passo e
 - AC-US007-01: L'utente può cercare indirizzi o punti di interesse (POI) tramite geocoding e visualizzare l'anteprima del tracciato prima di partire.
 - AC-US007-02: Durante la guida, il sistema aggiorna le istruzioni visive e vocali turn-by-turn in base alla posizione GPS in tempo reale.
 - AC-US007-03: In caso di deviazione o di nuova criticità sul percorso, il sistema ricalcola automaticamente l'itinerario.
+- AC-US007-04: L'utente può avviare una simulazione animata del percorso prima della partenza.
+- AC-US007-05: Durante la guida la visualizzazione utilizza un contrasto elevato e indicazioni sintetiche per ridurre le distrazioni.
 
 ---
 
@@ -123,6 +128,8 @@ Come utente autenticato, voglio segnalare in tempo reale eventi stradali (incide
 - AC-US009-01: L'utente può inviare una segnalazione geolocalizzata selezionando la categoria dell'evento (incidente, rallentamento, meteo, spazzaneve).
 - AC-US009-02: Il sistema rileva automaticamente la posizione GPS corrente permettendo una rifinitura manuale prima dell'invio.
 - AC-US009-03: In assenza di connettività, la segnalazione viene accodata in locale e trasmessa al ripristino della rete.
+- AC-US009-04: La segnalazione inviata compare sulla mappa degli altri utenti entro 3 secondi dall'invio.
+- AC-US009-05: L'invio di una segnalazione richiede al massimo 3 tocchi o click.
 
 ---
 
@@ -135,6 +142,7 @@ Come utente contributore, voglio che le mie segnalazioni vengano valutate dall'a
 - AC-US010-01: Il sistema valuta l'affidabilità di una segnalazione incrociando dati ufficiali PA e conferme di altri utenti nell'area spazio-temporale.
 - AC-US010-02: Una segnalazione priva di conferme entro il tempo limite decade automaticamente; una segnalazione smentita viene rimossa applicando una penalità al segnalatore.
 - AC-US010-03: Al raggiungimento di specifiche soglie di reputazione, il sistema attribuisce automaticamente punti e badge visualizzabili nel profilo utente.
+- AC-US010-04: L'utente può consultare lo storico delle proprie segnalazioni con stato di validazione, impatto sulla community e punteggio di reputazione complessivo.
 
 ---
 
@@ -147,6 +155,7 @@ Come utente autenticato, voglio configurare i canali, il raggio di prossimità e
 - AC-US011-01: L'utente può definire raggio di prossimità, canali (push, email) e orari di silenzio per ciascuna tipologia di allerta.
 - AC-US011-02: Il sistema invia notifiche preventive su cantieri o chiusure lungo i percorsi salvati prima dell'orario di partenza abituale.
 - AC-US011-03: Le notifiche ad alta priorità (emergenze) ignorano le fasce di silenzio e vengono comunque recapitate.
+- AC-US011-04: Il sistema sceglie il canale di recapito (push o email) in base alla priorità dell'evento e mantiene ogni avviso consultabile nel centro notifiche in-app.
 
 ---
 
@@ -171,6 +180,7 @@ Come operatore PA accreditato, voglio accedere a una dashboard riservata con aut
 - AC-US013-01: L'accesso alla dashboard richiede l'autenticazione a più fattori (MFA) e rispetta il controllo degli accessi basato sui ruoli (RBAC).
 - AC-US013-02: L'operatore può creare, modificare o revocare manualmente cantieri, ordinanze e chiusure stradali.
 - AC-US013-03: Le modifiche apportate dalla dashboard si propagano entro 3 secondi alla mappa pubblica e ai percorsi proposti agli utenti.
+- AC-US013-04: L'operatore può validare o respingere le segnalazioni della community dalla dashboard, e il giudizio dell'operatore prevale su quello automatico.
 
 ---
 
@@ -267,6 +277,7 @@ Come utente, voglio poter segnalare bug e inviare suggerimenti al Supporto Tecni
 - AC-US021-01: L'utente può inviare una descrizione testuale di un problema o di un suggerimento, allegando facoltativamente screenshot o log.
 - AC-US021-02: Dopo l'invio il sistema mostra una conferma con il riferimento univoco della richiesta.
 - AC-US021-03: In assenza di connessione la segnalazione viene salvata in locale e inoltrata alla prima connessione disponibile, senza perdita di dati.
+- AC-US021-04: L'utente può consultare lo stato del ticket di supporto aperto.
 
 ---
 
@@ -279,6 +290,7 @@ Come utente, voglio visualizzare sulla mappa la disponibilità in tempo reale de
 - AC-US022-01: Attivando il livello "Parcheggi e mobilità pubblica", la mappa mostra l'occupazione delle aree di sosta e la posizione delle linee del trasporto pubblico.
 - AC-US022-02: Se i dati in tempo reale non sono disponibili, il sistema mostra l'ultimo valore noto indicando l'orario del rilevamento.
 - AC-US022-03: Selezionando un parcheggio, l'utente può avviare il calcolo dell'itinerario verso di esso.
+- AC-US022-04: L'utente può filtrare i parcheggi per presenza di colonnine di ricarica EV o stalli riservati.
 
 ---
 
@@ -316,3 +328,40 @@ Come amministratore PA, voglio che il sistema esegua backup automatici giornalie
 - AC-US025-02: Almeno una copia del backup viene replicata in una zona geografica diversa da quella di produzione.
 - AC-US025-03: In caso di errore di trasferimento o di checksum non corrispondente, il sistema ritenta la procedura e, in caso di fallimento definitivo, invia una segnalazione urgente all'amministratore.
 - AC-US025-04: L'amministratore può eseguire il ripristino dei dati critici da un backup in ambiente di test.
+- AC-US025-05: In caso di incidente, i servizi core vengono ripristinati entro 4 ore, con una perdita di dati non superiore a 24 ore.
+
+---
+
+### US-026 - Utilizzo da smartphone e browser desktop
+**Collegamenti:** RNF-001; UC-017, UC-009
+
+Come utente, voglio usare NoJam dal mio smartphone o dal browser del mio computer in modo da accedere alle informazioni sulla viabilità senza dover cambiare dispositivo o aggiornare il mio hardware.
+
+**Criteri di accettazione:**
+- AC-US026-01: L'applicazione mobile è disponibile su Android dalla versione 10 e su iOS dalla versione 15.
+- AC-US026-02: L'interfaccia web è pienamente funzionante sulle ultime versioni di Firefox, Chrome, Safari ed Edge (dalla versione 115 per Firefox, Chrome ed Edge, dalla versione 16 per Safari).
+- AC-US026-03: L'interfaccia si adatta alle dimensioni dello schermo e mantiene corrette la visualizzazione delle mappe dinamiche e la geolocalizzazione su ogni dispositivo.
+
+---
+
+### US-027 - Accessibilità per utenti con disabilità
+**Collegamenti:** RNF-008; UC-017, UC-014
+
+Come utente con disabilità visiva, motoria o cognitiva, voglio poter consultare la mappa e inviare segnalazioni con tecnologie assistive in modo da utilizzare il servizio pubblico in autonomia.
+
+**Criteri di accettazione:**
+- AC-US027-01: L'interfaccia web e mobile rispetta lo standard WCAG 2.1 livello AA, con contrasto minimo di 4,5:1 per il testo normale.
+- AC-US027-02: Tutte le funzioni sono utilizzabili tramite tastiera e screen reader, e immagini e icone hanno testi alternativi.
+- AC-US027-03: I caratteri sono ridimensionabili fino al 200% senza perdita di funzionalità.
+
+---
+
+### US-028 - Disponibilità e scalabilità della piattaforma
+**Collegamenti:** RNF-003, RNF-004; UC-027, UC-021
+
+Come operatore PA, voglio che la piattaforma resti disponibile e reattiva anche durante picchi di traffico ed emergenze in modo da garantire ai cittadini informazioni affidabili nei momenti critici.
+
+**Criteri di accettazione:**
+- AC-US028-01: La piattaforma garantisce una disponibilità minima del 99,9% su base annua, con downtime non pianificato inferiore a 8 ore e 46 minuti all'anno.
+- AC-US028-02: La manutenzione programmata avviene solo tra le 01:00 e le 05:00, con preavviso agli operatori del Comune.
+- AC-US028-03: Il sistema scala fino a 50.000 utenti simultaneamente connessi e oltre 5.000 eventi o segnalazioni concorrenti, mantenendo le prestazioni indicate in RNF-002.
