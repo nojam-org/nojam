@@ -19,7 +19,7 @@ Come [tipo di utente], voglio [obiettivo] in modo da [beneficio].
 # User Story
 
 ### US-001 - Registrazione utente standard e tramite identità digitale
-**Collegamenti:** RF-001, RF-002, RF-049; UC-001, UC-002
+**Collegamenti:** RF-001, RF-002, RF-049; UC-001, UC-002, UC-049
 
 Come utente anonimo, voglio poter creare un account standard o autenticarmi tramite provider terzi e sistemi di identità digitale (Google SSO, SPID, CIE) in modo da accedere alle funzionalità personali e contributive della piattaforma.
 
@@ -151,7 +151,7 @@ Come utente autenticato, voglio configurare i canali, il raggio di prossimità e
 ---
 
 ### US-012 - Ingestion automatica dei dati ufficiali della PA
-**Collegamenti:** RF-013, RF-047; UC-013
+**Collegamenti:** RF-013, RF-047; UC-013, UC-047
 
 Come operatore PA, voglio che il sistema importi e sincronizzi automaticamente i dati statici su cantieri e ordinanze dai feed comunali/provinciali per mantenere aggiornata la mappa senza interventi manuali ripetitivi.
 
@@ -163,7 +163,7 @@ Come operatore PA, voglio che il sistema importi e sincronizzi automaticamente i
 ---
 
 ### US-013 - Dashboard di Smart Governance e gestione cantieri
-**Collegamenti:** RF-019, RF-043, RF-045; UC-019
+**Collegamenti:** RF-019, RF-043, RF-045; UC-019, UC-043, UC-045
 
 Come operatore PA accreditato, voglio accedere a una dashboard riservata con autenticazione a più fattori per pubblicare ordinanze e inserire cantieri o deviazioni stradali.
 
@@ -235,7 +235,7 @@ Come operatore PA, voglio caricare file in blocco (CSV, GeoJSON, Shapefile) per 
 ---
 
 ### US-019 - Esposizione di API Open Data verso sistemi terzi
-**Collegamenti:** RF-026, RF-048; UC-026
+**Collegamenti:** RF-026, RF-048; UC-026, UC-048
 
 Come sviluppatore/sistema terzo, voglio accedere ad API pubbliche documentate secondo lo standard OpenAPI 3.0 per consumare ed elaborare i dati aperti sulla viabilità cittadina.
 

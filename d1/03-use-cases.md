@@ -1169,3 +1169,301 @@ UC026c ..> : extend UC026
 
 **Estensioni:**
 1. Download manuale dei dataset Open Data direttamente dal portale web istituzionale.
+
+### Utente - Internazionalizzazione e identità federata
+- UC-042: Cambio lingua dell'interfaccia - RF-042
+- UC-049: Integrazione con provider di identità standard - RF-049
+
+```mermaid
+usecase-beta
+direction LR
+
+actor Utente("Utente")
+actor UtenteAnonimo("Utente Anonimo")
+actor UtenteAutenticato("Utente Autenticato")
+actor ProviderIdentita("Provider di Identità")
+
+systemBoundary NoJam["NoJam"]
+  UC042("UC-042: Cambio lingua dell'interfaccia")
+  UC049("UC-049: Integrazione con provider di identità standard")
+  UC002("UC-002: Login utente")
+  UC004("UC-004: Gestione preferenze")
+
+  UC042a("Selezione della lingua (IT, EN, DE)")
+  UC042b("Aggiornamento immediato dell'interfaccia senza riavvio")
+  UC042c("Memorizzazione preferenza nel profilo")
+  UC049a("Negoziazione protocollo standard (OAuth2 / OIDC)")
+  UC049b("Autenticazione federata SPID o CIE")
+  UC049c("Associazione identità digitale a profilo esistente")
+end
+
+UtenteAnonimo --|> Utente
+UtenteAutenticato --|> Utente
+
+Utente --> UC042
+UtenteAnonimo --> UC049
+UtenteAutenticato --> UC042c
+ProviderIdentita --> UC049
+
+UC042 ..> : include UC042a
+UC042 ..> : include UC042b
+UC049 ..> : include UC049a
+
+UC042c ..> : extend UC042
+UC042c ..> : extend UC004
+UC049 ..> : extend UC002
+UC049b ..> : extend UC049
+UC049c ..> : extend UC049
+```
+
+#### Use case UC-042: Cambio lingua dell'interfaccia
+**Riassunto:** Permette all'utente di selezionare e cambiare istantaneamente la lingua dell'interfaccia tra Italiano, Inglese e Tedesco senza richiedere il riavvio dell'applicazione.
+
+**Descrizione:**
+1. L'utente accede alla selezione della lingua dalle impostazioni dell'applicazione o dalla schermata principale.
+2. L'utente sceglie una delle lingue supportate (Italiano, Inglese, Tedesco).
+3. Il sistema applica istantaneamente il bundle di localizzazione selezionato a tutti gli elementi visivi dell'interfaccia grafica e ai messaggi di sistema.
+4. Il sistema memorizza la preferenza linguistica a livello locale sul dispositivo e, se l'utente è autenticato, la sincronizza con il suo profilo (include UC-004).
+
+**Eccezioni:**
+1. Risorsa di localizzazione non disponibile o stringa mancante: il sistema applica automaticamente il fallback sulla lingua di default (Italiano) mantenendo inalterata la navigazione.
+
+**Estensioni:**
+1. Rilevamento e impostazione automatica della lingua in base alle impostazioni internazionali di sistema del dispositivo al primo avvio.
+
+#### Use case UC-049: Integrazione con provider di identità standard
+**Riassunto:** Consente l'autenticazione sicura e federata degli utenti tramite provider di identità basati su protocolli standard aperti (OAuth 2.0, OpenID Connect) e identità digitali nazionali (SPID, CIE).
+
+**Descrizione:**
+1. L'utente seleziona l'accesso tramite un provider di identità esterno supportato (Google OAuth, SPID, CIE).
+2. Il sistema reindirizza l'utente alla schermata di autenticazione del provider selezionato avvalendosi di flussi standard OAuth 2.0 / OpenID Connect.
+3. L'utente completa la procedura di autenticazione presso il provider fornendo il consenso al trasferimento delle informazioni di base del profilo.
+4. Il provider restituisce al sistema un token crittografico firmato attestante l'identità dell'utente.
+5. Il sistema valida la firma crittografica del token, associa o crea l'account utente locale ed emette la sessione applicativa (estende UC-002).
+
+**Eccezioni:**
+1. Rifiuto dell'autenticazione o mancato consenso da parte dell'utente presso il provider esterno: il sistema annulla la procedura e reindirizza alla schermata di accesso locale senza creare sessioni.
+2. Token non valido o scaduto: il sistema respinge l'accesso, registra l'errore e richiede un nuovo tentativo di login.
+3. Provider di identità irraggiungibile o in errore: il sistema segnala l'indisponibilità temporanea e suggerisce una modalità di accesso alternativa.
+
+**Estensioni:**
+1. Associazione di un'identità federata (SPID o CIE) a un profilo locale preesistente verificato via email.
+
+### Operatore PA - Sicurezza e controllo accessi
+- UC-043: Autenticazione a più fattori per operatori PA - RF-043
+- UC-045: Controllo degli accessi alle funzionalità amministrative - RF-045
+
+```mermaid
+usecase-beta
+direction LR
+
+actor OperatorePA("Operatore PA")
+actor AmministratorePA("Amministratore PA")
+actor ProviderIdentita("Provider di Identità")
+
+systemBoundary NoJam["NoJam"]
+  UC043("UC-043: Autenticazione a più fattori per operatori PA")
+  UC045("UC-045: Controllo degli accessi alle funzionalità amministrative")
+  UC019("UC-019: Pannello di gestione e Smart Governance")
+  UC034("UC-034: Gestione ruoli e permessi degli operatori")
+  UC035("UC-035: Log di audit operativi")
+
+  UC043a("Verifica del secondo fattore OTP")
+  UC043b("Configurazione iniziale o reset del secondo fattore")
+  UC045a("Verifica dei permessi basata sui ruoli (RBAC)")
+  UC045b("Inibizione delle funzionalità non autorizzate")
+end
+
+AmministratorePA --|> OperatorePA
+
+OperatorePA --> UC043
+OperatorePA --> UC045
+AmministratorePA --> UC043b
+AmministratorePA --> UC034
+ProviderIdentita --> UC043
+
+UC043 ..> : include UC043a
+UC019 ..> : include UC043
+UC019 ..> : include UC045
+UC045 ..> : include UC045a
+UC045 ..> : include UC035
+
+UC043b ..> : extend UC043
+UC045b ..> : extend UC045
+UC045 ..> : extend UC034
+```
+
+#### Use case UC-043: Autenticazione a più fattori per operatori PA
+**Riassunto:** Richiede l'autenticazione a più fattori (MFA) agli operatori e amministratori della PA prima di consentire l'accesso alle funzionalità della dashboard di Smart Governance.
+
+**Descrizione:**
+1. L'Operatore PA inserisce le proprie credenziali primarie (email e password o credenziali federate della PA).
+2. Il sistema convalida le credenziali e rileva che l'account appartiene a un profilo con privilegi amministrativi.
+3. Il sistema richiede l'inserimento del codice di autenticazione a due fattori (OTP generato da app o inviato tramite canale sicuro).
+4. L'operatore inserisce il codice monouso.
+5. Il sistema valida il secondo fattore e concede l'accesso alla dashboard di Smart Governance (include UC-019).
+
+**Eccezioni:**
+1. Codice OTP non corretto o scaduto: il sistema nega l'accesso e richiede un nuovo inserimento, bloccando l'utenza dopo una serie di tentativi falliti consecutivi.
+2. Mancata configurazione preventiva del secondo fattore: il sistema avvia obbligatoriamente il flusso di onboarding MFA prima di abilitare l'accesso operativo.
+
+**Estensioni:**
+1. Reset e riconfigurazione assistita del secondo fattore autorizzata dall'Amministratore PA in caso di smarrimento del dispositivo dell'operatore.
+
+#### Use case UC-045: Controllo degli accessi alle funzionalità amministrative
+**Riassunto:** Applica un controllo degli accessi basato sui ruoli (RBAC) alle funzionalità amministrative, limitando le operazioni di ciascun operatore PA a quelle espressamente concesse dal proprio profilo.
+
+**Descrizione:**
+1. L'Operatore PA autenticato tenta di accedere a una funzionalità o di inviare una richiesta amministrativa (es. pubblicazione cantieri, modifica piano neve, consultazione audit).
+2. Il sistema verifica i ruoli e i permessi granulari attribuiti al profilo dell'operatore (definiti in UC-034).
+3. Se l'operatore dispone dell'abilitazione richiesta, il sistema autorizza l'esecuzione e registra l'evento nel log di audit (include UC-035).
+4. Il sistema esegue l'operazione richiesta e ne mostra l'esito sulla dashboard.
+
+**Eccezioni:**
+1. Profilo non autorizzato all'azione richiesta: il sistema inibisce l'operazione, mostra una notifica di autorizzazione insufficiente (HTTP 403 Forbidden) e registra l'accesso anomalo nel log di audit (UC-035).
+2. Modifica o revoca dei permessi durante una sessione attiva: il sistema blocca istantaneamente le chiamate successive e richiede l'aggiornamento della sessione.
+
+**Estensioni:**
+1. Inibizione preventiva nell'interfaccia grafica: il sistema nasconde o disattiva i comandi per le azioni non previste dal profilo dell'operatore.
+
+### Amministratore PA - Sicurezza dei dati e continuità operativa
+- UC-044: Cifratura delle comunicazioni e dei dati sensibili - RF-044
+- UC-046: Backup automatico dei dati critici - RF-046
+
+```mermaid
+usecase-beta
+direction LR
+
+actor AmministratorePA("Amministratore PA")
+actor Utente("Utente")
+
+systemBoundary NoJam["NoJam"]
+  UC044("UC-044: Cifratura delle comunicazioni e dei dati sensibili")
+  UC046("UC-046: Backup automatico dei dati critici")
+  UC035("UC-035: Log di audit operativi")
+
+  UC044a("Negoziazione canale cifrato TLS 1.2 o superiore")
+  UC044b("Cifratura a riposo dei dati sensibili (AES-256)")
+  UC044c("Rotazione programmata delle chiavi crittografiche")
+  UC046a("Generazione snapshot coerente con checksum")
+  UC046b("Replica cifrata in zona geografica remota")
+  UC046c("Ripristino dati critici (restore) da backup")
+end
+
+Utente --> UC044
+AmministratorePA --> UC044c
+AmministratorePA --> UC046
+AmministratorePA --> UC046c
+
+UC044 ..> : include UC044a
+UC044 ..> : include UC044b
+UC046 ..> : include UC046a
+UC046 ..> : include UC046b
+UC046 ..> : include UC035
+
+UC044c ..> : extend UC044
+UC046c ..> : extend UC046
+```
+
+#### Use case UC-044: Cifratura delle comunicazioni e dei dati sensibili
+**Riassunto:** Protegge i flussi di rete e i dati archiviati crittografando tutte le comunicazioni con protocollo TLS 1.2 o superiore e memorizzando i dati sensibili cifrati a riposo.
+
+**Descrizione:**
+1. Il client (app mobile o interfaccia web) o un servizio terzo stabilisce una sessione di rete con la piattaforma NoJam.
+2. Il sistema forza la negoziazione della connessione attraverso standard crittografici TLS 1.2 o superiore, rifiutando canali in chiaro.
+3. Durante il salvataggio dei dati nel database o nel file store, il sistema cifra a riposo tutti i dati sensibili (password tramite hashing sicuro e salato, token di sessione, coordinate GPS grezze, log di audit) con algoritmi robusti (es. AES-256).
+4. I dati vengono decifrati in memoria solo al momento della legittima consultazione da parte di processi autorizzati.
+
+**Eccezioni:**
+1. Connessione non conforme o tentativo di downgrade di protocollo TLS: il sistema rifiuta la negoziazione e termina la connessione.
+2. Errore di decifratura o chiave di crittografia non corrispondente: il sistema blocca l'accesso al record interessato, traccia l'anomalia nel log di audit e genera un alert per l'amministratore.
+
+**Estensioni:**
+1. Rotazione periodica o straordinaria delle chiavi di cifratura gestita in sicurezza dall'Amministratore PA.
+
+#### Use case UC-046: Backup automatico dei dati critici
+**Riassunto:** Esegue backup automatici giornalieri dei dati essenziali di NoJam e ne replica almeno una copia in una zona geografica remota, applicando le policy di retention e garantendo il ripristino.
+
+**Descrizione:**
+1. Con cadenza giornaliera (schedulazione periodica automatica), il sistema avvia la procedura di salvataggio dei dati critici (configurazioni, anagrafiche utente, eventi di viabilità, log di audit).
+2. Il sistema genera un'immagine consistente dei database e degli allegati, calcolando un codice di controllo (checksum crittografico) per garantirne l'integrità.
+3. Il sistema trasferisce e replica in modo protetto una copia del backup verso una seconda zona geografica indipendente da quella di produzione.
+4. Il sistema applica la retention prefissata, archiviando o eliminando le versioni scadute, e notifica l'esito nel registro delle operazioni consultabile dall'Amministratore PA (include UC-035).
+
+**Eccezioni:**
+1. Errore o interruzione durante il trasferimento verso la zona geografica remota: il sistema ritenta l'operazione e, in caso di fallimento definitivo, invia una segnalazione urgente all'Amministratore PA.
+2. Mancata corrispondenza del checksum del file di backup generato: l'archivio corrotto viene marcato come invalido e la procedura viene rieseguita.
+
+**Estensioni:**
+1. Esecuzione di una procedura di verifica o ripristino (restore) dei dati critici su richiesta dell'Amministratore PA in ambiente di test.
+
+### Sistemi esterni ed Enti Territoriali - Interoperabilità e formati standard
+- UC-047: Ingestion automatica di dati PA in formati standard - RF-047
+- UC-048: Documentazione e formati delle API pubbliche - RF-048
+
+```mermaid
+usecase-beta
+direction LR
+
+actor EnteTerritoriale("Ente Territoriale")
+actor OperatorePA("Operatore PA")
+actor SistemaTerzo("Sistema Terzo / Portale Istituzionale")
+
+systemBoundary NoJam["NoJam"]
+  UC047("UC-047: Ingestion automatica di dati PA in formati standard")
+  UC048("UC-048: Documentazione e formati delle API pubbliche")
+  UC013("UC-013: Ingestion e sincronizzazione dati ufficiali PA")
+  UC026("UC-026: Esportazione ed API dati aperti")
+
+  UC047a("Parsing e validazione CSV, GeoJSON e Shapefile")
+  UC047b("Notifica discrepanze e scarti all'operatore")
+  UC048a("Consultazione documentazione interattiva OpenAPI 3.0")
+  UC048b("Erogazione payload standard JSON e GeoJSON")
+  UC048c("Download specifica OpenAPI (JSON/YAML)")
+end
+
+EnteTerritoriale --> UC047
+OperatorePA --> UC047b
+SistemaTerzo --> UC048
+
+UC047 ..> : include UC047a
+UC047 ..> : include UC013
+UC048 ..> : include UC048a
+UC048 ..> : include UC048b
+UC048 ..> : include UC026
+
+UC047b ..> : extend UC047
+UC048c ..> : extend UC048
+```
+
+#### Use case UC-047: Ingestion automatica di dati PA in formati standard
+**Riassunto:** Acquisisce e sincronizza automaticamente i dati ufficiali provenienti dagli Enti Territoriali nei formati standard CSV, GeoJSON e Shapefile per alimentare mappa e routing.
+
+**Descrizione:**
+1. Il sistema interroga periodicamente gli endpoint o i repository ufficiali dell'Ente Territoriale.
+2. Il sistema riconosce e scarica i file contenenti aggiornamenti sulla viabilità nei formati standard CSV, GeoJSON o Shapefile.
+3. Il sistema effettua il parsing e la validazione dei dati spaziali e temporali, normalizzando le informazioni secondo gli standard interni di NoJam (include UC-013).
+4. I dati validati vengono pubblicati automaticamente sulla mappa (UC-017) e integrati nel motore di calcolo dei percorsi (UC-016).
+
+**Eccezioni:**
+1. File con formato corrotto o geometrie non conformi: il sistema scarta i record errati, mantiene inalterati i dati precedentemente validi e traccia le anomalie nel registro di sistema.
+2. Servizio o repository dell'ente non raggiungibile: il sistema pianifica nuovi tentativi di sincronizzazione mantenendo le ultime informazioni caricate con successo.
+
+**Estensioni:**
+1. Notifica delle discrepanze o degli scarti rilevati durante la sincronizzazione all'Operatore PA per opportuna verifica.
+
+#### Use case UC-048: Documentazione e formati delle API pubbliche
+**Riassunto:** Rende accessibile a terze parti la documentazione ufficiale delle API pubbliche secondo lo standard OpenAPI 3.0 e fornisce le risposte nei formati interoperabili JSON e GeoJSON.
+
+**Descrizione:**
+1. Un Sistema Terzo o uno sviluppatore esterno si collega al portale developer per consultare l'interfaccia delle API di NoJam.
+2. Il sistema espone la documentazione interattiva generata a partire dalla specifica conforme allo standard OpenAPI 3.0, comprensiva di descrizioni, rotte, schemi dati ed esempi.
+3. Il sistema terzo invia una richiesta alle API pubbliche (estende UC-026).
+4. Il sistema elabora la richiesta e restituisce i dati formattati in JSON o GeoJSON a seconda della natura del dato richiesto.
+
+**Eccezioni:**
+1. Richiesta formulata con parametri non conformi allo schema OpenAPI 3.0: il sistema risponde con errore HTTP 400 Bad Request allegando il dettaglio dei campi errati.
+2. Formato di risposta richiesto non supportato: il sistema restituisce codice HTTP 406 Not Acceptable indicando i formati accettati (`application/json`, `application/geo+json`).
+
+**Estensioni:**
+1. Download diretto della specifica OpenAPI 3.0 in formato JSON o YAML per importazione rapida in ambienti di sviluppo e testing.
