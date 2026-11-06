@@ -243,3 +243,76 @@ Come sviluppatore/sistema terzo, voglio accedere ad API pubbliche documentate se
 - AC-US019-01: Le API pubbliche del sistema sono documentate in standard OpenAPI 3.0 e restituiscono dati nei formati JSON o GeoJSON.
 - AC-US019-02: Il sistema richiede l'autenticazione delle chiamate API e restituisce un errore HTTP 429 in caso di superamento del rate limit.
 - AC-US019-03: È consentito anche il download manuale diretto dei dataset Open Data dal portale web.
+
+---
+
+### US-020 - Gestione delle preferenze e cambio lingua
+**Collegamenti:** RF-004, RF-042; UC-004, UC-042
+
+Come utente, voglio poter cambiare la lingua dell'interfaccia (italiano, inglese o tedesco) e le impostazioni generali dell'app in modo da usarla nella lingua e con le preferenze che preferisco.
+
+**Criteri di accettazione:**
+- AC-US020-01: L'utente può selezionare tra italiano, inglese e tedesco e il cambio lingua viene applicato immediatamente a tutta l'interfaccia e ai messaggi di sistema, senza riavvio dell'app.
+- AC-US020-02: La lingua e le preferenze generali sono memorizzate localmente e, per gli utenti autenticati, sincronizzate con il profilo, restando valide nelle sessioni successive.
+- AC-US020-03: In caso di stringa di localizzazione mancante, l'app mostra il testo in italiano (lingua di default) senza interrompere la navigazione.
+
+---
+
+### US-021 - Invio di feedback ed errori al Supporto Tecnico
+**Collegamenti:** RF-012; UC-012
+
+Come utente, voglio poter segnalare bug e inviare suggerimenti al Supporto Tecnico in modo da contribuire al miglioramento dell'applicazione.
+
+**Criteri di accettazione:**
+- AC-US021-01: L'utente può inviare una descrizione testuale di un problema o di un suggerimento, allegando facoltativamente screenshot o log.
+- AC-US021-02: Dopo l'invio il sistema mostra una conferma con il riferimento univoco della richiesta.
+- AC-US021-03: In assenza di connessione la segnalazione viene salvata in locale e inoltrata alla prima connessione disponibile, senza perdita di dati.
+
+---
+
+### US-022 - Parcheggi e trasporto pubblico sulla mappa
+**Collegamenti:** RF-024; UC-024
+
+Come utente, voglio visualizzare sulla mappa la disponibilità in tempo reale dei parcheggi e le linee del trasporto pubblico in modo da scegliere come spostarmi in città.
+
+**Criteri di accettazione:**
+- AC-US022-01: Attivando il livello "Parcheggi e mobilità pubblica", la mappa mostra l'occupazione delle aree di sosta e la posizione delle linee del trasporto pubblico.
+- AC-US022-02: Se i dati in tempo reale non sono disponibili, il sistema mostra l'ultimo valore noto indicando l'orario del rilevamento.
+- AC-US022-03: Selezionando un parcheggio, l'utente può avviare il calcolo dell'itinerario verso di esso.
+
+---
+
+### US-023 - Applicazione automatica delle politiche di conservazione
+**Collegamenti:** RF-039; UC-039
+
+Come amministratore PA, voglio che le politiche di conservazione dei dati vengano applicate automaticamente in modo da garantire la conformità al GDPR senza interventi manuali ripetitivi.
+
+**Criteri di accettazione:**
+- AC-US023-01: L'amministratore può configurare il periodo di conservazione per ciascuna tipologia di dato.
+- AC-US023-02: Il sistema verifica periodicamente le scadenze, anonimizza o elimina i record scaduti e registra l'operazione nel log di audit.
+- AC-US023-03: I record soggetti a un obbligo di conservazione prevalente vengono esclusi dalla cancellazione e marcati come trattenuti.
+
+---
+
+### US-024 - Cifratura delle comunicazioni e dei dati sensibili
+**Collegamenti:** RF-044; UC-044
+
+Come utente, voglio che tutte le comunicazioni con l'applicazione siano cifrate e che i miei dati sensibili siano protetti in modo da tutelare la mia privacy e la sicurezza del mio account.
+
+**Criteri di accettazione:**
+- AC-US024-01: Tutte le comunicazioni tra client, server e servizi terzi avvengono tramite TLS 1.2 o superiore; le connessioni in chiaro o con tentativo di downgrade vengono rifiutate.
+- AC-US024-02: Password, token di sessione, posizioni GPS grezze e log di audit sono cifrati a riposo (le password con hashing sicuro e salato, gli altri dati con algoritmi robusti come AES-256).
+- AC-US024-03: In caso di errore di decifratura, il sistema blocca l'accesso al record interessato, traccia l'anomalia nel log di audit e genera un alert per l'amministratore.
+
+---
+
+### US-025 - Backup automatico e ripristino dei dati critici
+**Collegamenti:** RF-046; UC-046
+
+Come amministratore PA, voglio che il sistema esegua backup automatici giornalieri dei dati critici con una copia in una zona geografica diversa in modo da poter ripristinare il servizio in caso di perdita di dati.
+
+**Criteri di accettazione:**
+- AC-US025-01: Ogni giorno il sistema esegue il backup di configurazioni, dati utente, eventi di viabilità e log di audit, calcolando un checksum di verifica.
+- AC-US025-02: Almeno una copia del backup viene replicata in una zona geografica diversa da quella di produzione.
+- AC-US025-03: In caso di errore di trasferimento o di checksum non corrispondente, il sistema ritenta la procedura e, in caso di fallimento definitivo, invia una segnalazione urgente all'amministratore.
+- AC-US025-04: L'amministratore può eseguire il ripristino dei dati critici da un backup in ambiente di test.
