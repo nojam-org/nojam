@@ -1161,7 +1161,7 @@ UC026c ..> : extend UC026
 **Descrizione:**
 1. Un applicativo di terze parti invia una richiesta HTTPS alle API pubbliche del sistema.
 2. Il sistema autentica la richiesta e ne verifica i permessi di accesso al dataset.
-3. Il sistema serializza ed esporta il dataset richiesto (cantieri attivi, ordinanze, dati aggregati sul traffico) in formato standard JSON, XML o GTFS.
+3. Il sistema serializza ed esporta il dataset richiesto (cantieri attivi, ordinanze, dati aggregati sul traffico) in formato standard JSON o GeoJSON.
 
 **Eccezioni:**
 1. Raggiungimento del limite di chiamate consentite: il sistema risponde con un errore 429 Too Many Requests indicando il tempo di attesa.
