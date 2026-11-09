@@ -1,0 +1,2346 @@
+openapi: 3.0.3
+info:
+  title: NoJam API
+  version: 1.0.0
+  description: |
+    API della piattaforma NoJam per la gestione della viabilità urbana. Le API pubbliche
+    sono documentate in OpenAPI 3.0 e restituiscono dati in formato JSON e/o GeoJSON (RF-048).
+    Le funzioni riservate agli operatori della Pubblica Amministrazione (PA) richiedono
+    autenticazione con ruolo PA e MFA (RF-043, RF-045).
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+tags:
+  - name: Autenticazione
+    description: Registrazione, login, logout e MFA (RF-001, RF-002, RF-007, RF-043, RF-049)
+  - name: Profilo
+    description: Profilo, preferenze, consensi e chiusura account (RF-003, RF-004, RF-008, RF-029, RF-037, RF-038, RF-042)
+  - name: Notifiche
+    description: Configurazione notifiche e centro notifiche (RF-010, RF-021, RF-040, RF-041)
+  - name: Luoghi e percorsi salvati
+    description: Salvataggio di luoghi e percorsi (RF-005)
+  - name: Mappa
+    description: Mappa interattiva, ricerca e parcheggi (RF-017, RF-024, RF-030)
+  - name: Percorsi
+    description: Calcolo, anteprima, ricalcolo e pianificazione dei viaggi (RF-016, RF-028, RF-031, RF-032)
+  - name: Segnalazioni
+    description: Segnalazioni della community, conferme e reputazione (RF-011, RF-014, RF-015, RF-022, RF-025)
+  - name: Feedback
+    description: Feedback e bug report (RF-012)
+  - name: Piano neve
+    description: Tratte e stato dello sgombero neve (RF-018)
+  - name: Open Data
+    description: API pubbliche di viabilità (RF-026, RF-048)
+  - name: PA - Segnalazioni
+    description: Validazione delle segnalazioni (RF-019, RF-022)
+  - name: PA - Viabilità
+    description: Ordinanze, cantieri, chiusure ed emergenze (RF-019, RF-027)
+  - name: PA - Importazione e analisi
+    description: Importazione massiva e report aggregati (RF-020, RF-036)
+  - name: PA - Amministrazione
+    description: Ruoli, permessi, audit e conservazione dei dati (RF-034, RF-035, RF-039, RF-045)
+paths:
+  /auth/register:
+    post:
+      tags: [Autenticazione]
+      operationId: registerUser
+      summary: Registrazione utente
+      description: Crea un account con i dati richiesti oppure tramite provider esterno. Richiede l'accettazione dei termini di servizio e della privacy policy e invia un'email di verifica (UC-001, UC-037, AC-US001-01, AC-US001-02).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Account creato in stato non verificato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /auth/verify-email:
+    post:
+      tags: [Autenticazione]
+      operationId: verifyEmail
+      summary: Conferma dell'indirizzo email
+      description: Completa la creazione dell'account (UC-001, passo 4).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+      responses:
+        '204':
+          description: Email verificata.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /auth/verify-email/resend:
+    post:
+      tags: [Autenticazione]
+      operationId: resendVerificationEmail
+      summary: Nuovo invio dell'email di verifica
+      description: Consente di richiedere un nuovo invio se il Servizio Email non era raggiungibile (UC-001, eccezione 2).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '202':
+          description: Richiesta accettata.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /auth/login:
+    post:
+      tags: [Autenticazione]
+      operationId: loginWithCredentials
+      summary: Login con credenziali
+      description: Apre la sessione e assegna i permessi del ruolo. Credenziali errate comportano un errore e nessuna sessione. Un account non verificato viene bloccato (UC-002).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Sessione aperta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/password-recovery:
+    post:
+      tags: [Autenticazione]
+      operationId: requestPasswordRecovery
+      summary: Recupero della password
+      description: Recupero della password dimenticata tramite email (UC-002, estensione 1).
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '202':
+          description: Richiesta accettata.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /auth/federated/{provider}:
+    post:
+      tags: [Autenticazione]
+      operationId: loginWithIdentityProvider
+      summary: Login tramite provider di identità
+      description: Autenticazione tramite Google SSO, SPID o CIE con protocolli OAuth 2.0 / OpenID Connect. Il sistema valida la firma del token e associa o crea l'account locale (UC-049).
+      security: []
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [google, spid, cie]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FederatedLoginRequest'
+      responses:
+        '200':
+          description: Sessione aperta.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/logout:
+    post:
+      tags: [Autenticazione]
+      operationId: logout
+      summary: Logout
+      description: Invalida il token di sessione (UC-007).
+      responses:
+        '204':
+          description: Sessione invalidata.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /auth/mfa/verify:
+    post:
+      tags: [Autenticazione]
+      operationId: verifyMfa
+      summary: Verifica del secondo fattore per operatori PA
+      description: Valida il codice monouso e concede l'accesso alla dashboard di Smart Governance. Dopo una serie di tentativi falliti consecutivi l'utenza viene bloccata (UC-043).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [otp]
+              properties:
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: MFA completata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Utenza bloccata dopo tentativi falliti consecutivi.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /me:
+    get:
+      tags: [Profilo]
+      operationId: getMyProfile
+      summary: Profilo dell'utente autenticato
+      description: Consultazione dei dati del profilo (RF-003, UC-003).
+      responses:
+        '200':
+          description: Profilo.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags: [Profilo]
+      operationId: updateMyProfile
+      summary: Aggiornamento del profilo
+      description: Valida i nuovi dati e segnala i campi non corretti (UC-003).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Profilo aggiornato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/account-deletion:
+    post:
+      tags: [Profilo]
+      operationId: requestAccountDeletion
+      summary: Chiusura e cancellazione dell'account
+      description: Richiede la conferma dell'identità tramite password oppure codice inviato via email. Se la verifica non è superata l'account resta attivo. Dopo la conferma la sessione viene chiusa, l'account eliminato e i contributi anonimizzati (RF-029, UC-029, AC-US003-02, AC-US003-03).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccountDeletionRequest'
+      responses:
+        '202':
+          description: Richiesta accettata.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Verifica dell'identità non superata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /me/preferences:
+    get:
+      tags: [Profilo]
+      operationId: getPreferences
+      summary: Preferenze e lingua
+      responses:
+        '200':
+          description: Preferenze correnti.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Profilo]
+      operationId: updatePreferences
+      summary: Aggiornamento di lingua e preferenze
+      description: Lingue disponibili italiano, inglese e tedesco. Il cambio è immediato e le preferenze restano valide nelle sessioni successive (RF-004, RF-042, UC-004, AC-US020-01, AC-US020-02).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Preferences'
+      responses:
+        '200':
+          description: Preferenze salvate.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/consents:
+    get:
+      tags: [Profilo]
+      operationId: getConsents
+      summary: Stato dei consensi
+      description: Consensi a cookie tecnici, analisi anonime, geolocalizzazione e tracciamento del percorso (RF-008, RF-038, UC-008).
+      responses:
+        '200':
+          description: Consensi correnti.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentSet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Profilo]
+      operationId: updateConsents
+      summary: Prestazione, modifica o revoca dei consensi
+      description: La revoca della geolocalizzazione disattiva le funzionalità che ne dipendono e avvisa l'utente. Ogni variazione è registrata nel registro dei consensi (UC-008, AC-US004-03).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentSet'
+      responses:
+        '200':
+          description: Consensi aggiornati.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentSet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/consents/history:
+    get:
+      tags: [Profilo]
+      operationId: getConsentHistory
+      summary: Registro dei consensi
+      description: Eventi di prestazione, modifica e revoca dei consensi (UC-008, passo 4).
+      responses:
+        '200':
+          description: Registro dei consensi.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsentRecord'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/data-exports:
+    post:
+      tags: [Profilo]
+      operationId: requestDataExport
+      summary: Esportazione dei dati personali
+      description: La richiesta è recapitata tramite il Servizio Email (UC-008, estensione 1).
+      responses:
+        '202':
+          description: Richiesta accettata.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/notification-settings:
+    get:
+      tags: [Notifiche]
+      operationId: getNotificationSettings
+      summary: Configurazione delle notifiche
+      responses:
+        '200':
+          description: Configurazione corrente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettings'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      tags: [Notifiche]
+      operationId: updateNotificationSettings
+      summary: Aggiornamento della configurazione delle notifiche
+      description: Canali push ed email, tipologie di evento, raggio di prossimità, fasce orarie di silenzio e sospensione temporanea. Le notifiche di emergenza restano sempre recapitate (RF-010, RF-040, UC-010, UC-040, AC-US011-01, AC-US011-03).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSettings'
+      responses:
+        '200':
+          description: Configurazione salvata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettings'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/notifications:
+    get:
+      tags: [Notifiche]
+      operationId: listNotifications
+      summary: Centro notifiche in-app
+      description: Ogni avviso resta consultabile nel centro notifiche anche se il recapito non è riuscito (RF-041, UC-041).
+      responses:
+        '200':
+          description: Notifiche.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/saved-items:
+    get:
+      tags: [Luoghi e percorsi salvati]
+      operationId: listSavedItems
+      summary: Luoghi e percorsi salvati
+      responses:
+        '200':
+          description: Elementi salvati.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedItem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Luoghi e percorsi salvati]
+      operationId: createSavedItem
+      summary: Salvataggio di un luogo o di un itinerario
+      description: L'elemento riceve un'etichetta personalizzata. Se è raggiunto il numero massimo di elementi salvabili il sistema segnala che occorre rimuoverne uno prima di aggiungerne altri (RF-005, UC-005, AC-US005-01, AC-US005-03).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedItemInput'
+      responses:
+        '201':
+          description: Elemento salvato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/saved-items/{savedItemId}:
+    parameters:
+      - $ref: '#/components/parameters/SavedItemId'
+    put:
+      tags: [Luoghi e percorsi salvati]
+      operationId: updateSavedItem
+      summary: Modifica di un elemento salvato
+      description: Modifica disponibile in qualsiasi momento (AC-US005-02).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedItemInput'
+      responses:
+        '200':
+          description: Elemento aggiornato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Luoghi e percorsi salvati]
+      operationId: deleteSavedItem
+      summary: Eliminazione di un elemento salvato
+      description: Eliminazione disponibile in qualsiasi momento (AC-US005-02).
+      responses:
+        '204':
+          description: Elemento eliminato.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /map/features:
+    get:
+      tags: [Mappa]
+      operationId: getMapFeatures
+      summary: Elementi della mappa
+      description: Traffico, cantieri attivi, ordinanze comunali, zone del piano neve e allerte confermate. Consultabile senza autenticazione. Il caricamento deve avvenire entro 1,5 secondi per il 95% delle richieste (RF-017, UC-017, AC-US002-01, AC-US002-04).
+      security: []
+      parameters:
+        - name: layers
+          in: query
+          description: Livelli da includere, separati da virgola.
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/MapLayer'
+          style: form
+          explode: false
+        - name: bbox
+          in: query
+          description: Area visualizzata, nel formato minLon,minLat,maxLon,maxLat.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Elementi della mappa come FeatureCollection GeoJSON.
+          content:
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/FeatureCollection'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureCollection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /map/features/{featureId}:
+    parameters:
+      - $ref: '#/components/parameters/FeatureId'
+    get:
+      tags: [Mappa]
+      operationId: getMapFeature
+      summary: Dettaglio di un elemento della mappa
+      description: Per un cantiere mostra periodo, impatto stimato e fonte ufficiale (UC-017, MU-Fig.1).
+      security: []
+      responses:
+        '200':
+          description: Dettaglio.
+          content:
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/Feature'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /search:
+    get:
+      tags: [Mappa]
+      operationId: searchPlaces
+      summary: Ricerca di indirizzi, toponimi e punti di interesse
+      description: Risultati ordinati per prossimità alla posizione corrente o all'area visualizzata. Se il Servizio di Geocoding non è raggiungibile la ricerca è limitata ai dati locali e il risultato è segnalato come parziale (UC-030).
+      security: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: lat
+          in: query
+          schema:
+            type: number
+        - name: lon
+          in: query
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Risultati.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /parkings:
+    get:
+      tags: [Mappa]
+      operationId: listParkings
+      summary: Parcheggi e trasporto pubblico
+      description: Occupazione delle aree di sosta e posizione delle linee del trasporto pubblico. Se i dati in tempo reale non sono disponibili viene mostrato l'ultimo valore noto con l'orario del rilevamento. Filtri per colonnine di ricarica EV e stalli riservati (RF-024, UC-024, AC-US022-01, AC-US022-02, AC-US022-04).
+      parameters:
+        - name: evCharging
+          in: query
+          schema:
+            type: boolean
+        - name: reservedBays
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Parcheggi come FeatureCollection GeoJSON.
+          content:
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/FeatureCollection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /snow-plan/segments:
+    get:
+      tags: [Piano neve]
+      operationId: listSnowPlanSegments
+      summary: Tratte del piano neve
+      description: Tratte programmate con fascia oraria e stato (da effettuare, in corso, completata). Non è previsto il tracciamento in tempo reale dei mezzi (RF-018, UC-018, MU-Fig.8, AC-US014-03).
+      security: []
+      responses:
+        '200':
+          description: Tratte come FeatureCollection GeoJSON.
+          content:
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/FeatureCollection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /routes:
+    post:
+      tags: [Percorsi]
+      operationId: calculateRoutes
+      summary: Calcolo degli itinerari
+      description: Calcola itinerari che tengono conto di cantieri, ordinanze, zone del piano neve e criticità convalidate. Con una data e un'ora di partenza future stima percorso e rallentamenti in base alle ordinanze programmate per quella fascia oraria. Se non esiste un percorso percorribile l'utente viene informato con `routes` vuoto e `message` (RF-016, RF-028, UC-016, UC-028, AC-US006-01, AC-US006-02, AC-US006-03).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteRequest'
+      responses:
+        '200':
+          description: Itinerari proposti.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteSet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /routes/{routeSetId}:
+    parameters:
+      - $ref: '#/components/parameters/RouteSetId'
+    get:
+      tags: [Percorsi]
+      operationId: getRouteSet
+      summary: Itinerari calcolati
+      responses:
+        '200':
+          description: Itinerari.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteSet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /routes/{routeSetId}/preview:
+    parameters:
+      - $ref: '#/components/parameters/RouteSetId'
+    get:
+      tags: [Percorsi]
+      operationId: getRoutePreview
+      summary: Anteprima del percorso
+      description: Tracciato, elenco delle manovre, tempi stimati e criticità presenti lungo il tragitto. Consente la simulazione del viaggio prima della partenza (RF-031, UC-031, AC-US007-01, AC-US007-04).
+      responses:
+        '200':
+          description: Anteprima.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoutePreview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /routes/{routeSetId}/recalculate:
+    parameters:
+      - $ref: '#/components/parameters/RouteSetId'
+    post:
+      tags: [Percorsi]
+      operationId: recalculateRoute
+      summary: Ricalcolo dell'itinerario
+      description: Ricalcola l'itinerario in caso di deviazione o di nuova criticità sul percorso (RF-032, UC-032, AC-US007-03).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentLocation]
+              properties:
+                currentLocation:
+                  $ref: '#/components/schemas/GeoPoint'
+      responses:
+        '200':
+          description: Nuovo itinerario.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteSet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /trips:
+    get:
+      tags: [Percorsi]
+      operationId: listPlannedTrips
+      summary: Viaggi pianificati
+      responses:
+        '200':
+          description: Viaggi pianificati.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlannedTrip'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Percorsi]
+      operationId: createPlannedTrip
+      summary: Salvataggio di un viaggio pianificato
+      description: Il sistema invia un promemoria automatico prima della partenza (UC-028, estensione 1; AC-US006-04).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlannedTripInput'
+      responses:
+        '201':
+          description: Viaggio salvato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlannedTrip'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /reports:
+    post:
+      tags: [Segnalazioni]
+      operationId: createReport
+      summary: Invio di una segnalazione in tempo reale
+      description: |
+        Invia una segnalazione geolocalizzata su un evento dinamico. La posizione è rilevata automaticamente e può essere rifinita manualmente. La segnalazione è visibile in stato provvisorio. Se esiste già una segnalazione duplicata nella stessa area spazio-temporale il sistema propone di confermare quella esistente, indicata in `existingReportId` (RF-009, RF-014, UC-014, AC-US009-01, AC-US009-02, AC-US009-04, AC-US009-05).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportInput'
+      responses:
+        '201':
+          description: Segnalazione registrata in stato provvisorio.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /reports/{reportId}:
+    parameters:
+      - $ref: '#/components/parameters/ReportId'
+    get:
+      tags: [Segnalazioni]
+      operationId: getReport
+      summary: Stato di una segnalazione
+      description: Stato di validazione, indice di affidabilità e impatto sulla community (RF-011, RF-015, UC-015, MU-Fig.9).
+      responses:
+        '200':
+          description: Segnalazione.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /reports/{reportId}/confirmations:
+    parameters:
+      - $ref: '#/components/parameters/ReportId'
+    post:
+      tags: [Segnalazioni]
+      operationId: confirmReport
+      summary: Conferma di una segnalazione attiva
+      description: Incrementa l'affidabilità della segnalazione e ne prolunga la validità (UC-022, estensione 1; AC-US010-02).
+      responses:
+        '200':
+          description: Conferma registrata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/reports:
+    get:
+      tags: [Segnalazioni]
+      operationId: listMyReports
+      summary: Cronologia delle segnalazioni
+      description: Storico con stato di approvazione o validazione, impatto sulla community e punteggio di reputazione. Se non esistono segnalazioni viene restituita una lista vuota (RF-011, UC-011, AC-US010-04).
+      responses:
+        '200':
+          description: Segnalazioni dell'utente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /me/reputation:
+    get:
+      tags: [Segnalazioni]
+      operationId: getMyReputation
+      summary: Punteggio di reputazione, livello e badge
+      description: Punti, livelli e badge di affidabilità assegnati in base all'accuratezza delle segnalazioni confermate (RF-015, RF-025, UC-025, AC-US010-03, MU-Fig.9).
+      responses:
+        '200':
+          description: Reputazione dell'utente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reputation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /feedback:
+    post:
+      tags: [Feedback]
+      operationId: createFeedback
+      summary: Invio di feedback o segnalazione di un bug
+      description: Il report può includere screenshot o log facoltativi. Dopo l'invio viene mostrata una conferma con il riferimento univoco. Se manca la connessione il report viene salvato in locale e inviato alla prima connessione disponibile (RF-012, UC-012, AC-US021-01, AC-US021-02, AC-US021-03).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeedbackInput'
+      responses:
+        '201':
+          description: Ticket aperto.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackTicket'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /feedback/{ticketId}:
+    parameters:
+      - $ref: '#/components/parameters/TicketId'
+    get:
+      tags: [Feedback]
+      operationId: getFeedbackTicket
+      summary: Stato del ticket di supporto
+      description: Consultazione dello stato del ticket aperto (AC-US021-04).
+      responses:
+        '200':
+          description: Ticket.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeedbackTicket'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /open-data/road-events:
+    get:
+      tags: [Open Data]
+      operationId: listOpenRoadEvents
+      summary: Cantieri, chiusure e ordinanze pubblicati
+      description: Dati pubblicati in formato JSON o GeoJSON, selezionabile con l'header `Accept`. Un formato non supportato restituisce 406 con i formati accettati (RF-026, UC-026, UC-048, AC-US019-01).
+      parameters:
+        - name: Accept
+          in: header
+          schema:
+            type: string
+            enum: [application/json, application/geo+json]
+      responses:
+        '200':
+          description: Dati pubblicati.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoadEvent'
+            application/geo+json:
+              schema:
+                $ref: '#/components/schemas/FeatureCollection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /open-data/traffic-aggregates:
+    get:
+      tags: [Open Data]
+      operationId: listOpenTrafficAggregates
+      summary: Dati aggregati e anonimizzati sul traffico
+      description: Flussi, tempi di percorrenza e criticità ricorrenti, anonimizzati (RF-020, RF-026, UC-026, AC-US016-02).
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: bbox
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Aggregati.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrafficAggregate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /openapi.json:
+    get:
+      tags: [Open Data]
+      operationId: getOpenApiJson
+      summary: Specifica OpenAPI in JSON
+      description: Download della specifica OpenAPI 3.0 per importazione rapida in ambienti di sviluppo e testing (UC-048, estensione 1).
+      security: []
+      responses:
+        '200':
+          description: Specifica OpenAPI 3.0 in JSON.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /openapi.yaml:
+    get:
+      tags: [Open Data]
+      operationId: getOpenApiYaml
+      summary: Specifica OpenAPI in YAML
+      description: Download della specifica OpenAPI 3.0 in YAML (UC-048, estensione 1).
+      security: []
+      responses:
+        '200':
+          description: Specifica OpenAPI 3.0 in YAML.
+          content:
+            application/yaml:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /pa/reports/pending:
+    get:
+      tags: [PA - Segnalazioni]
+      operationId: listPendingReports
+      summary: Coda delle segnalazioni da validare
+      description: Segnalazioni ordinate per impatto, con indice di affidabilità e decisione automatica. La decisione dell'operatore prevale su quella automatica (RF-019, RF-022, MU-Fig.12, AC-US013-04).
+      responses:
+        '200':
+          description: Segnalazioni in attesa di validazione.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/reports/{reportId}/decision:
+    parameters:
+      - $ref: '#/components/parameters/ReportId'
+    post:
+      tags: [PA - Segnalazioni]
+      operationId: decideReport
+      summary: Validazione o rifiuto di una segnalazione
+      description: L'operatore può intervenire manualmente sulla singola segnalazione in quanto fonte autorevole. Il giudizio dell'operatore prevale su quello automatico (RF-019, RF-022, UC-022, AC-US013-04).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision:
+                  type: string
+                  enum: [validate, reject]
+      responses:
+        '200':
+          description: Decisione registrata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/road-events:
+    get:
+      tags: [PA - Viabilità]
+      operationId: listRoadEvents
+      summary: Ordinanze, cantieri e chiusure
+      description: Elenco con stato (bozza, in pubblicazione, pubblicato) (RF-019, MU-Fig.12).
+      responses:
+        '200':
+          description: Eventi di viabilità.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoadEvent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [PA - Viabilità]
+      operationId: createRoadEvent
+      summary: Creazione di un cantiere, una chiusura o un'ordinanza
+      description: Il nuovo evento è in bozza e non è visibile agli utenti finché non viene pubblicato (RF-019, UC-019, AC-US013-02).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoadEventInput'
+      responses:
+        '201':
+          description: Evento creato in bozza.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoadEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/road-events/{roadEventId}:
+    parameters:
+      - $ref: '#/components/parameters/RoadEventId'
+    get:
+      tags: [PA - Viabilità]
+      operationId: getRoadEvent
+      summary: Dettaglio di un evento di viabilità
+      responses:
+        '200':
+          description: Evento.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoadEvent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [PA - Viabilità]
+      operationId: updateRoadEvent
+      summary: Modifica di un evento di viabilità
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoadEventInput'
+      responses:
+        '200':
+          description: Evento aggiornato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoadEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/road-events/{roadEventId}/publish:
+    parameters:
+      - $ref: '#/components/parameters/RoadEventId'
+    post:
+      tags: [PA - Viabilità]
+      operationId: publishRoadEvent
+      summary: Pubblicazione di un evento
+      description: Le modifiche si propagano alla mappa pubblica e ai percorsi proposti entro 3 secondi (RF-019, UC-019, AC-US013-03).
+      responses:
+        '200':
+          description: Evento in pubblicazione o pubblicato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoadEvent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/road-events/{roadEventId}/revoke:
+    parameters:
+      - $ref: '#/components/parameters/RoadEventId'
+    post:
+      tags: [PA - Viabilità]
+      operationId: revokeRoadEvent
+      summary: Revoca di un evento
+      description: L'operatore può revocare manualmente cantieri, ordinanze e chiusure (AC-US013-02).
+      responses:
+        '200':
+          description: Evento revocato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoadEvent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/emergencies:
+    post:
+      tags: [PA - Viabilità]
+      operationId: createEmergency
+      summary: Delimitazione di un'emergenza viabilità
+      description: L'operatore delimita sulla mappa l'area interessata e sceglie il tipo di evento. Finché non viene confermata da un secondo Amministratore PA l'emergenza resta in bozza e non viene propagata (RF-027, UC-027, MU-Fig.13, AC-US015-01).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmergencyInput'
+      responses:
+        '201':
+          description: Emergenza in bozza.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Emergency'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/emergencies/{emergencyId}/activate:
+    parameters:
+      - $ref: '#/components/parameters/EmergencyId'
+    post:
+      tags: [PA - Viabilità]
+      operationId: activateEmergency
+      summary: Attivazione dell'emergenza con conferma di un secondo Amministratore PA
+      description: Invia immediatamente una notifica push prioritaria a tutti gli utenti presenti o in avvicinamento all'area e aggiorna il motore di routing per evitare la zona interdetta (RF-027, UC-027, AC-US015-02, AC-US015-03).
+      responses:
+        '200':
+          description: Emergenza attiva.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Emergency'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/emergencies/{emergencyId}/archive:
+    parameters:
+      - $ref: '#/components/parameters/EmergencyId'
+    post:
+      tags: [PA - Viabilità]
+      operationId: archiveEmergency
+      summary: Archiviazione dell'emergenza
+      description: Disattivazione e archiviazione dell'evento al ripristino delle condizioni di sicurezza (UC-027, estensione 1).
+      responses:
+        '200':
+          description: Emergenza archiviata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Emergency'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/snow-plan/segments/{segmentId}:
+    parameters:
+      - $ref: '#/components/parameters/SegmentId'
+    patch:
+      tags: [Piano neve]
+      operationId: updateSnowSegmentStatus
+      summary: Aggiornamento dello stato di una tratta
+      description: L'operatore PA aggiorna lo stato di avanzamento della tratta. Uno stato non aggiornato oltre la fascia oraria prevista è presentato come non confermato (RF-018, UC-018, AC-US014-02).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: '#/components/schemas/SnowSegmentStatus'
+      responses:
+        '200':
+          description: Tratta aggiornata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnowSegment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/imports:
+    post:
+      tags: [PA - Importazione e analisi]
+      operationId: uploadImportFile
+      summary: Caricamento di un file per importazione massiva
+      description: Accetta file CSV, GeoJSON o Shapefile. Restituisce un'anteprima con record conformi, scartati e in conflitto. I dati diventano disponibili alla mappa e al motore di routing solo dopo la conferma (RF-036, UC-036, MU-Fig.14, AC-US018-01, AC-US018-02).
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Importazione in anteprima.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '400':
+          description: Formato non supportato o struttura non conforme; nel dettaglio gli errori rilevati.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/imports/{importId}:
+    parameters:
+      - $ref: '#/components/parameters/ImportId'
+    get:
+      tags: [PA - Importazione e analisi]
+      operationId: getImportJob
+      summary: Anteprima di un'importazione
+      responses:
+        '200':
+          description: Anteprima.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/imports/{importId}/confirm:
+    parameters:
+      - $ref: '#/components/parameters/ImportId'
+    post:
+      tags: [PA - Importazione e analisi]
+      operationId: confirmImport
+      summary: Conferma dell'importazione
+      description: Rende effettivi i record e li propaga alla mappa e al motore di routing. Per i record in conflitto l'operatore sceglie se sovrascriverli o ignorarli. L'esito è registrato nel log di audit (UC-036, eccezione 2; AC-US018-03).
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conflictResolution:
+                  type: string
+                  enum: [overwrite, ignore]
+      responses:
+        '200':
+          description: Importazione completata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/imports/{importId}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/ImportId'
+    post:
+      tags: [PA - Importazione e analisi]
+      operationId: cancelImport
+      summary: Annullamento di un'importazione
+      description: Annullamento di un'importazione completata entro un intervallo di tempo definito, con ripristino dello stato precedente (UC-036, estensione 1).
+      responses:
+        '200':
+          description: Importazione annullata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/analytics/traffic:
+    get:
+      tags: [PA - Importazione e analisi]
+      operationId: getTrafficAnalytics
+      summary: Report aggregati sul traffico
+      description: Grafici e dati aggregati su tempi di percorrenza e colli di bottiglia per area e periodo, anonimizzati. Esportabili in PDF o CSV (RF-020, UC-020, AC-US016-01, AC-US016-02, AC-US016-03).
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: bbox
+          in: query
+          schema:
+            type: string
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv, pdf]
+            default: json
+      responses:
+        '200':
+          description: Report.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrafficAggregate'
+            text/csv:
+              schema:
+                type: string
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/roles:
+    get:
+      tags: [PA - Amministrazione]
+      operationId: listRoles
+      summary: Ruoli
+      responses:
+        '200':
+          description: Ruoli.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [PA - Amministrazione]
+      operationId: createRole
+      summary: Creazione di un ruolo personalizzato
+      description: Permessi granulari di lettura, inserimento, modifica, validazione e pubblicazione (RF-034, UC-034, AC-US017-01).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleInput'
+      responses:
+        '201':
+          description: Ruolo creato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/roles/{roleId}:
+    parameters:
+      - $ref: '#/components/parameters/RoleId'
+    put:
+      tags: [PA - Amministrazione]
+      operationId: updateRole
+      summary: Modifica di un ruolo
+      description: Non è consentito rimuovere l'ultimo ruolo con privilegi amministrativi (UC-034, eccezione 1).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleInput'
+      responses:
+        '200':
+          description: Ruolo aggiornato.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/operators/{operatorId}/roles:
+    parameters:
+      - $ref: '#/components/parameters/OperatorId'
+    put:
+      tags: [PA - Amministrazione]
+      operationId: assignOperatorRoles
+      summary: Assegnazione dei ruoli a un operatore
+      description: Le nuove abilitazioni si applicano dalla sessione successiva se l'operatore ha attività in corso (UC-034, eccezione 2).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [roleIds]
+              properties:
+                roleIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: Ruoli assegnati.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/audit-log:
+    get:
+      tags: [PA - Amministrazione]
+      operationId: listAuditLog
+      summary: Log di audit operativo
+      description: Registro non modificabile di inserimenti, modifiche, validazioni, pubblicazioni, importazioni e cambi di ruolo. Filtrabile per operatore, tipologia di azione e intervallo temporale. Non esistono operazioni di modifica o cancellazione; i tentativi vengono rifiutati e tracciati (RF-035, UC-035, AC-US017-02, AC-US017-03).
+      parameters:
+        - name: operatorId
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Voci del registro.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLogEntry'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /pa/retention-policies/{dataType}:
+    parameters:
+      - $ref: '#/components/parameters/DataType'
+    get:
+      tags: [PA - Amministrazione]
+      operationId: getRetentionPolicy
+      summary: Periodo di conservazione per tipologia di dato
+      responses:
+        '200':
+          description: Policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetentionPolicy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags: [PA - Amministrazione]
+      operationId: updateRetentionPolicy
+      summary: Configurazione del periodo di conservazione
+      description: Il sistema applica automaticamente la policy, anonimizzando o eliminando i dati scaduti e registrando l'operazione nel log di audit (RF-039, UC-039, AC-US023-01, AC-US023-02).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RetentionPolicy'
+      responses:
+        '200':
+          description: Policy aggiornata.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetentionPolicy'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token di sessione ottenuto con login o autenticazione federata. Per le funzioni PA è richiesta anche l'MFA (RF-043, RF-049).
+  parameters:
+    FeatureId:
+      name: featureId
+      in: path
+      required: true
+      schema:
+        type: string
+    SavedItemId:
+      name: savedItemId
+      in: path
+      required: true
+      schema:
+        type: string
+    RouteSetId:
+      name: routeSetId
+      in: path
+      required: true
+      schema:
+        type: string
+    ReportId:
+      name: reportId
+      in: path
+      required: true
+      schema:
+        type: string
+    TicketId:
+      name: ticketId
+      in: path
+      required: true
+      schema:
+        type: string
+    RoadEventId:
+      name: roadEventId
+      in: path
+      required: true
+      schema:
+        type: string
+    EmergencyId:
+      name: emergencyId
+      in: path
+      required: true
+      schema:
+        type: string
+    SegmentId:
+      name: segmentId
+      in: path
+      required: true
+      schema:
+        type: string
+    ImportId:
+      name: importId
+      in: path
+      required: true
+      schema:
+        type: string
+    RoleId:
+      name: roleId
+      in: path
+      required: true
+      schema:
+        type: string
+    OperatorId:
+      name: operatorId
+      in: path
+      required: true
+      schema:
+        type: string
+    DataType:
+      name: dataType
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/DataType'
+  responses:
+    BadRequest:
+      description: Richiesta non valida; il corpo indica i campi errati.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Autenticazione assente o non valida.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Permessi insufficienti per il ruolo dell'operatore. Il tentativo viene registrato nel log di audit (RF-045, UC-045).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotAcceptable:
+      description: Formato richiesto non supportato; il dettaglio indica i formati accettati (application/json, application/geo+json).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    TooManyRequests:
+      description: Limite di chiamate superato; il tempo di attesa è indicato nell'header Retry-After.
+      headers:
+        Retry-After:
+          description: Secondi di attesa prima di una nuova richiesta.
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        details:
+          type: string
+          description: Dettaglio dei campi o dei formati non conformi.
+    GeoPoint:
+      type: object
+      required: [lat, lon]
+      properties:
+        lat:
+          type: number
+          format: double
+        lon:
+          type: number
+          format: double
+    GeoJsonGeometry:
+      type: object
+      required: [type, coordinates]
+      properties:
+        type:
+          type: string
+          enum: [Point, LineString, Polygon, MultiLineString, MultiPolygon]
+        coordinates:
+          type: array
+          items: {}
+    Feature:
+      type: object
+      required: [type, geometry, properties]
+      properties:
+        type:
+          type: string
+          enum: [Feature]
+        id:
+          type: string
+        geometry:
+          $ref: '#/components/schemas/GeoJsonGeometry'
+        properties:
+          type: object
+          additionalProperties: true
+    FeatureCollection:
+      type: object
+      required: [type, features]
+      properties:
+        type:
+          type: string
+          enum: [FeatureCollection]
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+    MapLayer:
+      type: string
+      enum: [traffic, roadworks, ordinances, snowPlan, alerts, parking, transit]
+    SearchResult:
+      type: object
+      required: [results, partial]
+      properties:
+        results:
+          type: array
+          items:
+            type: object
+            required: [name, location]
+            properties:
+              name:
+                type: string
+              address:
+                type: string
+              location:
+                $ref: '#/components/schemas/GeoPoint'
+              distanceMeters:
+                type: number
+        partial:
+          type: boolean
+          description: true se la ricerca è limitata ai dati locali (UC-030, eccezione 2).
+    ReportType:
+      type: string
+      enum: [accident, slowdown, obstacle, adverseWeather, snowplow]
+      description: Incidente, rallentamento, ostacolo, meteo avverso, passaggio spazzaneve (UC-014).
+    ValidationStatus:
+      type: string
+      enum: [inValidation, confirmed, expired, refuted]
+      description: In validazione, confermata, decaduta, smentita (MU-Fig.9).
+    Report:
+      type: object
+      required: [id, type, location, status]
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/ReportType'
+        location:
+          $ref: '#/components/schemas/GeoPoint'
+        status:
+          $ref: '#/components/schemas/ValidationStatus'
+        reliabilityIndex:
+          type: number
+          description: Indice di affidabilità del dato (RF-015).
+        communityImpact:
+          type: string
+          description: Impatto sulla community (RF-011).
+        reputationChange:
+          type: integer
+          description: Variazione del punteggio del segnalatore (MU-Fig.9).
+        existingReportId:
+          type: string
+          description: Presente quando la segnalazione duplica una segnalazione esistente (UC-014, eccezione 2).
+        createdAt:
+          type: string
+          format: date-time
+    ReportInput:
+      type: object
+      required: [type, location]
+      properties:
+        type:
+          $ref: '#/components/schemas/ReportType'
+        location:
+          $ref: '#/components/schemas/GeoPoint'
+        comment:
+          type: string
+          description: Commento facoltativo (UC-014, estensione 1).
+        photo:
+          type: string
+          format: binary
+          description: Fotografia facoltativa (UC-014, estensione 1).
+    Reputation:
+      type: object
+      required: [score, level, badges]
+      properties:
+        score:
+          type: integer
+        level:
+          type: string
+        badges:
+          type: array
+          items:
+            type: object
+            required: [name, unlocked]
+            properties:
+              name:
+                type: string
+              unlocked:
+                type: boolean
+    RegisterRequest:
+      type: object
+      required: [firstName, lastName, email, birthDate, acceptedTerms]
+      properties:
+        firstName:
+          type: string
+          description: Nome (UC-001, passo 2).
+        lastName:
+          type: string
+          description: Cognome (UC-001, passo 2).
+        email:
+          type: string
+          format: email
+        birthDate:
+          type: string
+          format: date
+          description: Data di nascita (UC-001, passo 2).
+        phone:
+          type: string
+          description: Numero di telefono facoltativo (UC-001, estensione 1).
+        password:
+          type: string
+          format: password
+          description: Credenziali standard (UC-002, passo 1).
+        acceptedTerms:
+          type: boolean
+          description: Accettazione esplicita di termini di servizio e privacy policy (UC-037). Deve essere true.
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    FederatedLoginRequest:
+      type: object
+      required: [authorizationCode, redirectUri]
+      properties:
+        authorizationCode:
+          type: string
+        redirectUri:
+          type: string
+          format: uri
+    Session:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+    UserRole:
+      type: string
+      enum: [user, paOperator, paAdmin]
+      description: Utente autenticato, Operatore PA, Amministratore PA (UC-006, UC-034).
+    User:
+      type: object
+      required: [id, email, role, verified]
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        birthDate:
+          type: string
+          format: date
+        phone:
+          type: string
+        role:
+          $ref: '#/components/schemas/UserRole'
+        verified:
+          type: boolean
+          description: false per un account in stato non verificato (UC-001, eccezione 2).
+    ProfileUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        birthDate:
+          type: string
+          format: date
+        phone:
+          type: string
+    AccountDeletionRequest:
+      type: object
+      required: [confirmation]
+      properties:
+        confirmation:
+          type: object
+          description: Password oppure codice inviato via email.
+          properties:
+            password:
+              type: string
+              format: password
+            emailCode:
+              type: string
+    Preferences:
+      type: object
+      required: [language]
+      properties:
+        language:
+          type: string
+          enum: [it, en, de]
+          description: Italiano (default), inglese, tedesco (RF-042, RNF-005).
+        highContrast:
+          type: boolean
+          description: Contrasto elevato per la navigazione (RNF-006, US-007 AC-US007-05).
+    ConsentSet:
+      type: object
+      properties:
+        technicalCookies:
+          type: boolean
+          description: Sempre attivi (MU-Fig.4).
+        anonymousAnalytics:
+          type: boolean
+        geolocation:
+          type: boolean
+        routeTracking:
+          type: boolean
+    ConsentRecord:
+      type: object
+      required: [consent, granted, timestamp]
+      properties:
+        consent:
+          type: string
+          enum: [technicalCookies, anonymousAnalytics, geolocation, routeTracking]
+        granted:
+          type: boolean
+        timestamp:
+          type: string
+          format: date-time
+    NotificationSettings:
+      type: object
+      properties:
+        channels:
+          type: array
+          items:
+            type: string
+            enum: [push, email]
+        categories:
+          type: array
+          items:
+            type: string
+            enum: [roadworks, weatherEmergencies, snowPlan, reportOutcomes]
+        proximityRadiusMeters:
+          type: integer
+          minimum: 0
+        quietHours:
+          type: array
+          items:
+            type: object
+            required: [from, to]
+            properties:
+              from:
+                type: string
+                example: '22:00'
+              to:
+                type: string
+                example: '07:00'
+        suspendedUntil:
+          type: string
+          format: date-time
+          description: Sospensione temporanea delle notifiche non critiche (UC-040, estensione 1).
+    Notification:
+      type: object
+      required: [id, message, createdAt]
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    SavedItemInput:
+      type: object
+      required: [kind, label]
+      properties:
+        kind:
+          type: string
+          enum: [place, route]
+        label:
+          type: string
+          description: Etichetta personalizzata (AC-US005-01).
+        location:
+          $ref: '#/components/schemas/GeoPoint'
+        route:
+          $ref: '#/components/schemas/RouteRequest'
+    SavedItem:
+      allOf:
+        - $ref: '#/components/schemas/SavedItemInput'
+        - type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+    RouteRequest:
+      type: object
+      required: [origin, destination]
+      properties:
+        origin:
+          $ref: '#/components/schemas/GeoPoint'
+        destination:
+          $ref: '#/components/schemas/GeoPoint'
+        departureAt:
+          type: string
+          format: date-time
+          description: Data e ora di partenza futura (RF-028, UC-028).
+    RouteSet:
+      type: object
+      required: [id, routes]
+      properties:
+        id:
+          type: string
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Route'
+        message:
+          type: string
+          description: Presente quando non esiste un percorso percorribile (UC-016, eccezione 1).
+    Route:
+      type: object
+      required: [id, distanceMeters, durationSeconds]
+      properties:
+        id:
+          type: string
+        distanceMeters:
+          type: integer
+        durationSeconds:
+          type: integer
+        delayEstimateSeconds:
+          type: integer
+          description: Stima dei rallentamenti per la fascia oraria scelta (MU-Fig.6).
+        avoidedOfficialCriticalities:
+          type: array
+          items:
+            type: string
+          description: Criticità ufficiali evitate (MU-Fig.6).
+        geometry:
+          $ref: '#/components/schemas/GeoJsonGeometry'
+    RoutePreview:
+      type: object
+      required: [routeSetId, steps]
+      properties:
+        routeSetId:
+          type: string
+        steps:
+          type: array
+          items:
+            type: object
+            required: [instruction]
+            properties:
+              instruction:
+                type: string
+              distanceMeters:
+                type: integer
+        simulationAvailable:
+          type: boolean
+    PlannedTripInput:
+      type: object
+      required: [origin, destination, departureAt]
+      properties:
+        origin:
+          $ref: '#/components/schemas/GeoPoint'
+        destination:
+          $ref: '#/components/schemas/GeoPoint'
+        departureAt:
+          type: string
+          format: date-time
+    PlannedTrip:
+      allOf:
+        - $ref: '#/components/schemas/PlannedTripInput'
+        - type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+    FeedbackInput:
+      type: object
+      required: [kind, description]
+      properties:
+        kind:
+          type: string
+          enum: [bug, suggestion]
+        description:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: string
+            format: binary
+          description: Screenshot o log facoltativi (UC-012).
+    FeedbackTicket:
+      type: object
+      required: [id, reference, status]
+      properties:
+        id:
+          type: string
+        reference:
+          type: string
+          description: Riferimento univoco della richiesta (AC-US021-02).
+        status:
+          type: string
+          description: Stato del ticket (AC-US021-04).
+    SnowSegmentStatus:
+      type: string
+      enum: [toDo, inProgress, completed]
+      description: Da effettuare, in corso, completata (MU-Fig.8).
+    SnowSegment:
+      type: object
+      required: [id, status]
+      properties:
+        id:
+          type: string
+        status:
+          $ref: '#/components/schemas/SnowSegmentStatus'
+        confirmed:
+          type: boolean
+          description: false se lo stato non è stato aggiornato entro la fascia oraria (UC-018, eccezione 1).
+    PublicationStatus:
+      type: string
+      enum: [draft, publishing, published, revoked]
+      description: Bozza, in pubblicazione, pubblicato (MU-Fig.12); revocato (AC-US013-02).
+    RoadEventKind:
+      type: string
+      enum: [roadworks, closure, ordinance]
+      description: Cantiere, chiusura, ordinanza (RF-019).
+    RoadEventInput:
+      type: object
+      required: [kind, title, geometry]
+      properties:
+        kind:
+          $ref: '#/components/schemas/RoadEventKind'
+        title:
+          type: string
+        description:
+          type: string
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+        geometry:
+          $ref: '#/components/schemas/GeoJsonGeometry'
+    RoadEvent:
+      allOf:
+        - $ref: '#/components/schemas/RoadEventInput'
+        - type: object
+          required: [id, status]
+          properties:
+            id:
+              type: string
+            status:
+              $ref: '#/components/schemas/PublicationStatus'
+    EmergencyInput:
+      type: object
+      required: [eventType, area]
+      properties:
+        eventType:
+          type: string
+          description: Tipo di evento straordinario, ad esempio nevicate eccezionali, frane, allagamenti (RF-027).
+        area:
+          $ref: '#/components/schemas/GeoJsonGeometry'
+    Emergency:
+      allOf:
+        - $ref: '#/components/schemas/EmergencyInput'
+        - type: object
+          required: [id, status]
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+              enum: [draft, active, archived]
+    ImportJob:
+      type: object
+      required: [id, status]
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum: [preview, confirmed, cancelled]
+        valid:
+          type: integer
+          description: Record conformi (UC-036, passo 2).
+        rejected:
+          type: integer
+          description: Record scartati (UC-036, passo 2).
+        conflicts:
+          type: integer
+          description: Record in conflitto con dati già presenti (UC-036, eccezione 2).
+    TrafficAggregate:
+      type: object
+      properties:
+        area:
+          type: string
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        averageTravelSeconds:
+          type: number
+        recurringBottlenecks:
+          type: integer
+    Role:
+      type: object
+      required: [id, name, permissions]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    RoleInput:
+      type: object
+      required: [name, permissions]
+      properties:
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+    Permission:
+      type: string
+      enum: [read, insert, edit, validate, publish]
+      description: Lettura, inserimento, modifica, validazione, pubblicazione (RF-034).
+    AuditLogEntry:
+      type: object
+      required: [id, timestamp, operatorId, action]
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        operatorId:
+          type: string
+        role:
+          type: string
+        action:
+          type: string
+          description: Inserimento, modifica, validazione, pubblicazione, importazione, cambio di ruolo (UC-035).
+        target:
+          type: string
+          description: Oggetto interessato dall'azione (UC-035).
+    DataType:
+      type: string
+      enum: [personalData, locationTraces, reports]
+      description: Dati personali, tracciati di posizione, segnalazioni (UC-039).
+    RetentionPolicy:
+      type: object
+      required: [dataType, periodDays]
+      properties:
+        dataType:
+          $ref: '#/components/schemas/DataType'
+        periodDays:
+          type: integer
+          minimum: 1
+          description: Periodo di conservazione configurato dall'Amministratore PA (AC-US023-01).
