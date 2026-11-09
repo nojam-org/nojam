@@ -21,7 +21,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-lang-italian
-          sudo npm install --global @mermaid-js/mermaid-cli@11
+          sudo npm install --global @mermaid-js/mermaid-cli@12
+          npx --yes @puppeteer/browsers install chrome-headless-shell@156.0.8078.47 --path "$HOME/.cache/puppeteer"
+          echo "PUPPETEER_EXECUTABLE_PATH=$(find "$HOME/.cache/puppeteer/chrome-headless-shell" -type f -name chrome-headless-shell | head -n1)" >> "$GITHUB_ENV"
 
       - name: write configs and cover/toc
         run: |
@@ -99,10 +101,13 @@ jobs:
               { print }
             ' "$md" > "build/d1/$base.md"
           done
+          test -x "$PUPPETEER_EXECUTABLE_PATH" || { echo "chrome-headless-shell not found: '$PUPPETEER_EXECUTABLE_PATH'"; exit 1; }
+          jq --arg exe "$PUPPETEER_EXECUTABLE_PATH" '. + {executablePath: $exe}' \
+            build/puppeteer-config.json > build/puppeteer-config.tmp.json
           for mmd in build/d1/diagrams/*.mmd; do
             mmdc \
               -c build/mermaid-config.json \
-              -p build/puppeteer-config.json \
+              -p build/puppeteer-config.tmp.json \
               -b white \
               -i "$mmd" \
               -o "${mmd%.mmd}.pdf"
