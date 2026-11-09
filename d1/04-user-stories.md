@@ -1,0 +1,367 @@
+# User Story
+
+<!--
+Ogni User Story utilizza un identificatore stabile US-XXX e ogni relativo criterio di accettazione è identificato come AC-USXXX-YY (ad esempio, US-000 → AC-US000-01, AC-US000-02, …). Gli stessi identificatori vengono mantenuti nelle sezioni di traceability e negli artefatti dei deliverable successivi.
+-->
+
+<!--
+### US-000 - [Titolo user story]
+**Collegamenti:** RF-000; UC-000
+
+Come [tipo di utente], voglio [obiettivo] in modo da [beneficio].
+
+**Criteri di accettazione:**
+- AC-US000-01: [criterio di accettazione verificabile.]
+- AC-US000-02: [criterio di accettazione verificabile.]
+- AC-US000-03: [criterio di accettazione verificabile.]
+-->
+
+# User Story
+
+### US-001 - Registrazione utente standard e tramite identità digitale
+**Collegamenti:** RF-001, RF-002, RF-049; UC-001, UC-002, UC-049
+
+Come utente anonimo, voglio poter creare un account standard o autenticarmi tramite provider terzi e sistemi di identità digitale (Google SSO, SPID, CIE) in modo da accedere alle funzionalità personali e contributive della piattaforma.
+
+**Criteri di accettazione:**
+- AC-US001-01: L'utente può registrarsi inserendo nome, cognome, email e data di nascita oppure selezionando un provider esterno (Google SSO, SPID, CIE).
+- AC-US001-02: Il sistema invia un'email di verifica all'indirizzo fornito prima di completare la creazione dell'account standard.
+- AC-US001-03: In caso di credenziali errate o autenticazione rifiutata dal provider terzo, il sistema mostra un messaggio di errore e blocca l'accesso.
+
+---
+
+### US-002 - Consultazione della mappa interattiva senza autenticazione
+**Collegamenti:** RF-006, RF-017; UC-006, UC-017
+
+Come utente anonimo, voglio poter consultare la mappa interattiva del territorio visualizzando traffico, cantieri e ordinanze in modo da informarmi sulla viabilità senza l'obbligo di creare un account.
+
+**Criteri di accettazione:**
+- AC-US002-01: L'utente non autenticato visualizza i livelli di traffico, cantieri attivi, ordinanze comunali e zone del piano neve.
+- AC-US002-02: Se l'utente tenta di accedere a funzionalità riservate (es. invio segnalazioni), il sistema blocca l'operazione e richiede l'autenticazione.
+- AC-US002-03: In assenza di connessione, il sistema mostra l'ultima versione delle tessere della mappa memorizzata in cache.
+- AC-US002-04: La mappa e gli eventi visualizzati si caricano entro 1,5 secondi per il 95% delle richieste.
+
+---
+
+### US-003 - Gestione profilo e chiusura account (GDPR)
+**Collegamenti:** RF-003, RF-007, RF-029; UC-003, UC-007, UC-029
+
+Come utente autenticato, voglio aggiornare le mie informazioni personali o richiedere l'eliminazione definitiva del mio account in modo da mantenere il controllo sui miei dati nel rispetto del GDPR.
+
+**Criteri di accettazione:**
+- AC-US003-01: L'utente può consultare e modificare le informazioni del proprio profilo dalla sezione dedicata.
+- AC-US003-02: La richiesta di eliminazione dell'account richiede una conferma dell'identità (tramite password o codice via email).
+- AC-US003-03: Confermata l'eliminazione, il sistema invalida la sessione, cancella i dati personali e anonimizza i contributi stradali precedentemente inviati.
+
+---
+
+### US-004 - Gestione dei consensi privacy e cookie
+**Collegamenti:** RF-008, RF-037, RF-038; UC-008, UC-037, UC-038
+
+Come utente, voglio poter accettare o modificare in modo granulare i consensi al trattamento dei dati, alla geolocalizzazione e ai cookie in modo da tutelare la mia privacy durante l'uso dell'app.
+
+**Criteri di accettazione:**
+- AC-US004-01: Il sistema richiede l'accettazione dei Termini di Servizio e Privacy Policy in fase di registrazione e a ogni aggiornamento sostanziale.
+- AC-US004-02: Al primo accesso viene mostrato un banner per la gestione granulare dei cookie e dei trattamenti non essenziali.
+- AC-US004-03: La revoca del consenso alla geolocalizzazione comporta la disattivazione delle sole funzionalità che ne dipendono, avvisando l'utente.
+
+---
+
+### US-005 - Salvataggio di luoghi e percorsi preferiti
+**Collegamenti:** RF-005, RF-023; UC-005, UC-023
+
+Come utente autenticato, voglio salvare, modificare ed eliminare luoghi frequenti e destinazioni preferite in modo da accedere rapidamente alla navigazione e ricevere notifiche dedicate.
+
+**Criteri di accettazione:**
+- AC-US005-01: L'utente può salvare un luogo o un itinerario assegnandogli un'etichetta personalizzata.
+- AC-US005-02: Il sistema consente la modifica ed eliminazione degli elementi salvati in qualsiasi momento.
+- AC-US005-03: Raggiunto il limite massimo di elementi salvabili, il sistema segnala l'impossibilità di aggiungerne altri senza prima rimuoverne uno esistente.
+- AC-US005-04: L'utente può scaricare in locale mappe e percorsi salvati e, in assenza di connessione, consultarli e ottenere un routing di base.
+
+---
+
+### US-006 - Calcolo e ottimizzazione dei percorsi (Routing Predittivo)
+**Collegamenti:** RF-016, RF-028; UC-016, UC-028
+
+Come utente autenticato, voglio inserire punto di partenza, destinazione e orario futuro per ottenere l'itinerario ottimale basato sia su dati ufficiali della PA sia su segnalazioni validate della community.
+
+**Criteri di accettazione:**
+- AC-US006-01: Il motore di routing integra cantieri programmati, ordinanze e criticità convalidate in tempo reale per proporre gli itinerari migliori.
+- AC-US006-02: Impostando un orario di partenza futuro, il sistema stima i rallentamenti in base alle ordinanze programmate per quella specifica fascia oraria.
+- AC-US006-03: In caso di chiusura totale del percorso senza alternative percorribili, il sistema notifica l'impossibilità di raggiungere la destinazione.
+- AC-US006-04: L'utente può salvare un viaggio pianificato e ricevere un promemoria automatico prima della partenza.
+
+---
+
+### US-007 - Navigazione assistita Turn-by-Turn e simulazione
+**Collegamenti:** RF-030, RF-031, RF-032; UC-030, UC-031, UC-032
+
+Come utente guidatore, voglio ricevere indicazioni vocali e visive passo-passo e poter visualizzare l'anteprima del viaggio in modo da guidare in sicurezza senza distrazioni.
+
+**Criteri di accettazione:**
+- AC-US007-01: L'utente può cercare indirizzi o punti di interesse (POI) tramite geocoding e visualizzare l'anteprima del tracciato prima di partire.
+- AC-US007-02: Durante la guida, il sistema aggiorna le istruzioni visive e vocali turn-by-turn in base alla posizione GPS in tempo reale.
+- AC-US007-03: In caso di deviazione o di nuova criticità sul percorso, il sistema ricalcola automaticamente l'itinerario.
+- AC-US007-04: L'utente può avviare una simulazione animata del percorso prima della partenza.
+- AC-US007-05: Durante la guida la visualizzazione utilizza un contrasto elevato e indicazioni sintetiche per ridurre le distrazioni.
+
+---
+
+### US-008 - Integrazione con infotainment veicolare (Android Auto / CarPlay)
+**Collegamenti:** RF-033; UC-033
+
+Come utente guidatore, voglio proiettare l'interfaccia di navigazione sullo schermo del veicolo in modo da interagire in modalità hands-free durante la guida.
+
+**Criteri di accettazione:**
+- AC-US008-01: L'applicazione supporta la proiezione dell'interfaccia su Android Auto e Apple CarPlay.
+- AC-US008-02: Le funzionalità complesse non ammesse durante la guida vengono disabilitate e rese disponibili solo a veicolo fermo.
+- AC-US008-03: In caso di disconnessione dello schermo del veicolo, la navigazione prosegue sul dispositivo mobile senza interrompere la sessione.
+
+---
+
+### US-009 - Invio di segnalazioni viarie in tempo reale
+**Collegamenti:** RF-009, RF-014; UC-009, UC-014
+
+Come utente autenticato, voglio segnalare in tempo reale eventi stradali (incidenti, spazzaneve, ostacoli) rilevando la mia posizione in modo da avvisare gli altri utenti della community.
+
+**Criteri di accettazione:**
+- AC-US009-01: L'utente può inviare una segnalazione geolocalizzata selezionando la categoria dell'evento (incidente, rallentamento, meteo, spazzaneve).
+- AC-US009-02: Il sistema rileva automaticamente la posizione GPS corrente permettendo una rifinitura manuale prima dell'invio.
+- AC-US009-03: In assenza di connettività, la segnalazione viene accodata in locale e trasmessa al ripristino della rete.
+- AC-US009-04: La segnalazione inviata compare sulla mappa degli altri utenti entro 3 secondi dall'invio.
+- AC-US009-05: L'invio di una segnalazione richiede al massimo 3 tocchi o click.
+
+---
+
+### US-010 - Moderazione automatica e punteggio di reputazione
+**Collegamenti:** RF-011, RF-015, RF-022, RF-025; UC-011, UC-015, UC-022, UC-025
+
+Come utente contributore, voglio che le mie segnalazioni vengano valutate dall'algoritmo tramite incrocio dati in modo da accrescere la mia reputazione ed erogare badge nel sistema di gamification.
+
+**Criteri di accettazione:**
+- AC-US010-01: Il sistema valuta l'affidabilità di una segnalazione incrociando dati ufficiali PA e conferme di altri utenti nell'area spazio-temporale.
+- AC-US010-02: Una segnalazione priva di conferme entro il tempo limite decade automaticamente; una segnalazione smentita viene rimossa applicando una penalità al segnalatore.
+- AC-US010-03: Al raggiungimento di specifiche soglie di reputazione, il sistema attribuisce automaticamente punti e badge visualizzabili nel profilo utente.
+- AC-US010-04: L'utente può consultare lo storico delle proprie segnalazioni con stato di validazione, impatto sulla community e punteggio di reputazione complessivo.
+
+---
+
+### US-011 - Notifiche preventive e configurazione avanzata
+**Collegamenti:** RF-010, RF-021, RF-040, RF-041; UC-010, UC-021, UC-040, UC-041
+
+Come utente autenticato, voglio configurare i canali, il raggio di prossimità e le fasce orarie di silenzio delle notifiche per essere avvisato preventivamente solo degli eventi rilevanti sui miei percorsi.
+
+**Criteri di accettazione:**
+- AC-US011-01: L'utente può definire raggio di prossimità, canali (push, email) e orari di silenzio per ciascuna tipologia di allerta.
+- AC-US011-02: Il sistema invia notifiche preventive su cantieri o chiusure lungo i percorsi salvati prima dell'orario di partenza abituale.
+- AC-US011-03: Le notifiche ad alta priorità (emergenze) ignorano le fasce di silenzio e vengono comunque recapitate.
+- AC-US011-04: Il sistema sceglie il canale di recapito (push o email) in base alla priorità dell'evento e mantiene ogni avviso consultabile nel centro notifiche in-app.
+
+---
+
+### US-012 - Ingestion automatica dei dati ufficiali della PA
+**Collegamenti:** RF-013, RF-047; UC-013, UC-047
+
+Come operatore PA, voglio che il sistema importi e sincronizzi automaticamente i dati statici su cantieri e ordinanze dai feed comunali/provinciali per mantenere aggiornata la mappa senza interventi manuali ripetitivi.
+
+**Criteri di accettazione:**
+- AC-US012-01: Il sistema effettua periodicamente il parsing automatizzato dei dati statici in formati standard (CSV, GeoJSON, Shapefile).
+- AC-US012-02: I dati importati vengono normalizzati e resi subito disponibili al motore di routing e alla mappa interattiva.
+- AC-US012-03: Se i feed esterni non sono raggiungibili o contengono errori di formato, il sistema registra un'anomalia e mantiene in uso gli ultimi dati validi.
+
+---
+
+### US-013 - Dashboard di Smart Governance e gestione cantieri
+**Collegamenti:** RF-019, RF-043, RF-045; UC-019, UC-043, UC-045
+
+Come operatore PA accreditato, voglio accedere a una dashboard riservata con autenticazione a più fattori per pubblicare ordinanze e inserire cantieri o deviazioni stradali.
+
+**Criteri di accettazione:**
+- AC-US013-01: L'accesso alla dashboard richiede l'autenticazione a più fattori (MFA) e rispetta il controllo degli accessi basato sui ruoli (RBAC).
+- AC-US013-02: L'operatore può creare, modificare o revocare manualmente cantieri, ordinanze e chiusure stradali.
+- AC-US013-03: Le modifiche apportate dalla dashboard si propagano entro 3 secondi alla mappa pubblica e ai percorsi proposti agli utenti.
+- AC-US013-04: L'operatore può validare o respingere le segnalazioni della community dalla dashboard, e il giudizio dell'operatore prevale su quello automatico.
+
+---
+
+### US-014 - Gestione e monitoraggio del Piano Neve
+**Collegamenti:** RF-018; UC-018
+
+Come operatore PA, voglio inserire la pianificazione delle tratte di sgombero neve e aggiornarne lo stato di avanzamento per informare in trasparenza i cittadini durante le nevicate.
+
+**Criteri di accettazione:**
+- AC-US014-01: L'operatore può caricare le tratte programmate del piano neve con le relative fasce orarie di intervento.
+- AC-US014-02: L'operatore e le segnalazioni convalidate degli utenti aggiornano lo stato della tratta (da effettuare, in corso, completata).
+- AC-US014-03: La mappa pubblica mostra visivamente lo stato aggiornato dei percorsi senza tracciare i singoli mezzi fisici in tempo reale.
+
+---
+
+### US-015 - Attivazione della modalità Emergenza Viabilità
+**Collegamenti:** RF-027; UC-027
+
+Come operatore PA, voglio poter attivare lo stato di emergenza su una determinata area geografica per inviare allerte immediate ad alta priorità in caso di eventi straordinari (es. frane, alluvioni).
+
+**Criteri di accettazione:**
+- AC-US015-01: L'operatore delimita sulla dashboard la zona interessata dall'evento straordinario e attiva la modalità "Emergenza Viabilità".
+- AC-US015-02: Il sistema invia immediatamente una notifica push prioritaria a tutti gli utenti presenti o in avvicinamento all'area.
+- AC-US015-03: Il motore di routing aggiorna istantaneamente i calcoli per evitare la zona interdetta finché l'emergenza non viene archiviata.
+
+---
+
+### US-016 - Analisi aggregate e reportistica del traffico
+**Collegamenti:** RF-020; UC-020
+
+Come operatore PA, voglio consultare ed esportare report aggregati ed anonimizzati sui flussi e le criticità viarie per pianificare interventi infrastrutturali urbani basati sui dati.
+
+**Criteri di accettazione:**
+- AC-US016-01: La dashboard genera grafici e dati aggregati su tempi di percorrenza e colli di bottiglia selezionando area e periodo temporale.
+- AC-US016-02: Tutti i dati elaborati sono rigorosamente anonimizzati in conformità alle norme sulla privacy.
+- AC-US016-03: L'operatore può esportare i report elaborati in formato PDF o CSV.
+
+---
+
+### US-017 - Gestione ruoli e audit log degli operatori PA
+**Collegamenti:** RF-034, RF-035; UC-034, UC-035
+
+Come amministratore PA, voglio gestire i ruoli degli operatori e consultare un registro di audit non modificabile per garantire la tracciabilità e la responsabilità di ogni modifica alla viabilità.
+
+**Criteri di accettazione:**
+- AC-US017-01: L'amministratore può creare ruoli personalizzati con permessi granulari (lettura, inserimento, validazione, pubblicazione).
+- AC-US017-02: Ogni azione eseguita dagli utenti PA viene registrata in un log di audit non modificabile comprensivo di timestamp e autore.
+- AC-US017-03: Il sistema blocca la cancellazione o la modifica manuale delle voci presenti nel log di audit.
+
+---
+
+### US-018 - Importazione massiva dei dati di viabilità
+**Collegamenti:** RF-036; UC-036
+
+Come operatore PA, voglio caricare file in blocco (CSV, GeoJSON, Shapefile) per inserire contemporaneamente un elevato numero di cantieri o chiusure stradali programmate.
+
+**Criteri di accettazione:**
+- AC-US018-01: L'interfaccia permette l'upload di file nei formati standard CSV, GeoJSON e Shapefile.
+- AC-US018-02: Il sistema valida il file e fornisce un'anteprima mostrando i record corretti e quelli scartati prima di confermare la scrittura.
+- AC-US018-03: L'esito dell'importazione viene registrato automaticamente nel log di audit.
+
+---
+
+### US-019 - Esposizione di API Open Data verso sistemi terzi
+**Collegamenti:** RF-026, RF-048; UC-026, UC-048
+
+Come sviluppatore/sistema terzo, voglio accedere ad API pubbliche documentate secondo lo standard OpenAPI 3.0 per consumare ed elaborare i dati aperti sulla viabilità cittadina.
+
+**Criteri di accettazione:**
+- AC-US019-01: Le API pubbliche del sistema sono documentate in standard OpenAPI 3.0 e restituiscono dati nei formati JSON o GeoJSON.
+- AC-US019-02: Il sistema richiede l'autenticazione delle chiamate API e restituisce un errore HTTP 429 in caso di superamento del rate limit.
+- AC-US019-03: È consentito anche il download manuale diretto dei dataset Open Data dal portale web.
+
+---
+
+### US-020 - Gestione delle preferenze e cambio lingua
+**Collegamenti:** RF-004, RF-042; UC-004, UC-042
+
+Come utente, voglio poter cambiare la lingua dell'interfaccia (italiano, inglese o tedesco) e le impostazioni generali dell'app in modo da usarla nella lingua e con le preferenze che preferisco.
+
+**Criteri di accettazione:**
+- AC-US020-01: L'utente può selezionare tra italiano, inglese e tedesco e il cambio lingua viene applicato immediatamente a tutta l'interfaccia e ai messaggi di sistema, senza riavvio dell'app.
+- AC-US020-02: La lingua e le preferenze generali sono memorizzate localmente e, per gli utenti autenticati, sincronizzate con il profilo, restando valide nelle sessioni successive.
+- AC-US020-03: In caso di stringa di localizzazione mancante, l'app mostra il testo in italiano (lingua di default) senza interrompere la navigazione.
+
+---
+
+### US-021 - Invio di feedback ed errori al Supporto Tecnico
+**Collegamenti:** RF-012; UC-012
+
+Come utente, voglio poter segnalare bug e inviare suggerimenti al Supporto Tecnico in modo da contribuire al miglioramento dell'applicazione.
+
+**Criteri di accettazione:**
+- AC-US021-01: L'utente può inviare una descrizione testuale di un problema o di un suggerimento, allegando facoltativamente screenshot o log.
+- AC-US021-02: Dopo l'invio il sistema mostra una conferma con il riferimento univoco della richiesta.
+- AC-US021-03: In assenza di connessione la segnalazione viene salvata in locale e inoltrata alla prima connessione disponibile, senza perdita di dati.
+- AC-US021-04: L'utente può consultare lo stato del ticket di supporto aperto.
+
+---
+
+### US-022 - Parcheggi e trasporto pubblico sulla mappa
+**Collegamenti:** RF-024; UC-024
+
+Come utente, voglio visualizzare sulla mappa la disponibilità in tempo reale dei parcheggi e le linee del trasporto pubblico in modo da scegliere come spostarmi in città.
+
+**Criteri di accettazione:**
+- AC-US022-01: Attivando il livello "Parcheggi e mobilità pubblica", la mappa mostra l'occupazione delle aree di sosta e la posizione delle linee del trasporto pubblico.
+- AC-US022-02: Se i dati in tempo reale non sono disponibili, il sistema mostra l'ultimo valore noto indicando l'orario del rilevamento.
+- AC-US022-03: Selezionando un parcheggio, l'utente può avviare il calcolo dell'itinerario verso di esso.
+- AC-US022-04: L'utente può filtrare i parcheggi per presenza di colonnine di ricarica EV o stalli riservati.
+
+---
+
+### US-023 - Applicazione automatica delle politiche di conservazione
+**Collegamenti:** RF-039; UC-039
+
+Come amministratore PA, voglio che le politiche di conservazione dei dati vengano applicate automaticamente in modo da garantire la conformità al GDPR senza interventi manuali ripetitivi.
+
+**Criteri di accettazione:**
+- AC-US023-01: L'amministratore può configurare il periodo di conservazione per ciascuna tipologia di dato.
+- AC-US023-02: Il sistema verifica periodicamente le scadenze, anonimizza o elimina i record scaduti e registra l'operazione nel log di audit.
+- AC-US023-03: I record soggetti a un obbligo di conservazione prevalente vengono esclusi dalla cancellazione e marcati come trattenuti.
+
+---
+
+### US-024 - Cifratura delle comunicazioni e dei dati sensibili
+**Collegamenti:** RF-044; UC-044
+
+Come utente, voglio che tutte le comunicazioni con l'applicazione siano cifrate e che i miei dati sensibili siano protetti in modo da tutelare la mia privacy e la sicurezza del mio account.
+
+**Criteri di accettazione:**
+- AC-US024-01: Tutte le comunicazioni tra client, server e servizi terzi avvengono tramite TLS 1.2 o superiore; le connessioni in chiaro o con tentativo di downgrade vengono rifiutate.
+- AC-US024-02: Password, token di sessione, posizioni GPS grezze e log di audit sono cifrati a riposo (le password con hashing sicuro e salato, gli altri dati con algoritmi robusti come AES-256).
+- AC-US024-03: In caso di errore di decifratura, il sistema blocca l'accesso al record interessato, traccia l'anomalia nel log di audit e genera un alert per l'amministratore.
+
+---
+
+### US-025 - Backup automatico e ripristino dei dati critici
+**Collegamenti:** RF-046; UC-046
+
+Come amministratore PA, voglio che il sistema esegua backup automatici giornalieri dei dati critici con una copia in una zona geografica diversa in modo da poter ripristinare il servizio in caso di perdita di dati.
+
+**Criteri di accettazione:**
+- AC-US025-01: Ogni giorno il sistema esegue il backup di configurazioni, dati utente, eventi di viabilità e log di audit, calcolando un checksum di verifica.
+- AC-US025-02: Almeno una copia del backup viene replicata in una zona geografica diversa da quella di produzione.
+- AC-US025-03: In caso di errore di trasferimento o di checksum non corrispondente, il sistema ritenta la procedura e, in caso di fallimento definitivo, invia una segnalazione urgente all'amministratore.
+- AC-US025-04: L'amministratore può eseguire il ripristino dei dati critici da un backup in ambiente di test.
+- AC-US025-05: In caso di incidente, i servizi core vengono ripristinati entro 4 ore, con una perdita di dati non superiore a 24 ore.
+
+---
+
+### US-026 - Utilizzo da smartphone e browser desktop
+**Collegamenti:** RNF-001; UC-017, UC-009
+
+Come utente, voglio usare NoJam dal mio smartphone o dal browser del mio computer in modo da accedere alle informazioni sulla viabilità senza dover cambiare dispositivo o aggiornare il mio hardware.
+
+**Criteri di accettazione:**
+- AC-US026-01: L'applicazione mobile è disponibile su Android dalla versione 10 e su iOS dalla versione 15.
+- AC-US026-02: L'interfaccia web è pienamente funzionante sulle ultime versioni di Firefox, Chrome, Safari ed Edge (dalla versione 115 per Firefox, Chrome ed Edge, dalla versione 16 per Safari).
+- AC-US026-03: L'interfaccia si adatta alle dimensioni dello schermo e mantiene corrette la visualizzazione delle mappe dinamiche e la geolocalizzazione su ogni dispositivo.
+
+---
+
+### US-027 - Accessibilità per utenti con disabilità
+**Collegamenti:** RNF-008; UC-017, UC-014
+
+Come utente con disabilità visiva, motoria o cognitiva, voglio poter consultare la mappa e inviare segnalazioni con tecnologie assistive in modo da utilizzare il servizio pubblico in autonomia.
+
+**Criteri di accettazione:**
+- AC-US027-01: L'interfaccia web e mobile rispetta lo standard WCAG 2.1 livello AA, con contrasto minimo di 4,5:1 per il testo normale.
+- AC-US027-02: Tutte le funzioni sono utilizzabili tramite tastiera e screen reader, e immagini e icone hanno testi alternativi.
+- AC-US027-03: I caratteri sono ridimensionabili fino al 200% senza perdita di funzionalità.
+
+---
+
+### US-028 - Disponibilità e scalabilità della piattaforma
+**Collegamenti:** RNF-003, RNF-004; UC-027, UC-021
+
+Come operatore PA, voglio che la piattaforma resti disponibile e reattiva anche durante picchi di traffico ed emergenze in modo da garantire ai cittadini informazioni affidabili nei momenti critici.
+
+**Criteri di accettazione:**
+- AC-US028-01: La piattaforma garantisce una disponibilità minima del 99,9% su base annua, con downtime non pianificato inferiore a 8 ore e 46 minuti all'anno.
+- AC-US028-02: La manutenzione programmata avviene solo tra le 01:00 e le 05:00, con preavviso agli operatori del Comune.
+- AC-US028-03: Il sistema scala fino a 50.000 utenti simultaneamente connessi e oltre 5.000 eventi o segnalazioni concorrenti, mantenendo le prestazioni indicate in RNF-002.
